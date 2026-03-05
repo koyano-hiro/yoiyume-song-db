@@ -1,17 +1,16 @@
 import type { Metadata } from "next";
-import { M_PLUS_1p } from "next/font/google";
+import { IBM_Plex_Sans_JP } from "next/font/google";
 import "./globals.css";
 
-// M PLUS 1pフォントの設定
-const mPlus1p = M_PLUS_1p({
-  weight: ["400", "500", "700", "800"], // 必要な文字の太さを指定
+const ibmPlexSansJp = IBM_Plex_Sans_JP({
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "よいゆめ 歌データベース",
-  description: "よいゆめの歌唱・配信データベース",
+  title: "よいゆめの歌と演奏を探すデータベース",
+  description: "非公式ファンサイト",
 };
 
 export default function RootLayout({
@@ -21,10 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      {/* bodyタグにフォントのクラスを適用 */}
-      <body className={`${mPlus1p.className} antialiased`}>
-        {children}
-      </body>
+      <body className={ibmPlexSansJp.className}>{children}</body>
     </html>
   );
 }

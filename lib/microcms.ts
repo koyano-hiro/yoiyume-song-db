@@ -5,6 +5,13 @@ export const client = createClient({
   apiKey: process.env.MICROCMS_API_KEY || "",
 });
 
+// チャンネルの型を新規追加
+export type Channel = {
+  id: string;
+  name: string;
+  url: string;
+};
+
 export type Video = {
   id: string;
   title: string;
@@ -12,6 +19,7 @@ export type Video = {
   streamingDate: string;
   isArchived: boolean;
   type: string[];
+  channel?: Channel; // 文字列からChannel型への参照に変更
 };
 
 export type Song = {
@@ -22,9 +30,13 @@ export type Song = {
 
 export type Performance = {
   id: string;
-  video: Video;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+  revisedAt: string;
   song: Song;
+  video: Video;
+  singers?: string[];
   startSeconds?: number;
   collaborators?: string;
-  singers: string[]; // 歌唱メンバーの配列を追加
 };
