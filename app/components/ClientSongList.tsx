@@ -72,8 +72,25 @@ export default function ClientSongList({
   const [selectedMonth, setSelectedMonth] = useState("");
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
   const [selectedType, setSelectedType] = useState<string>("");
+  const [selectedArtist, setSelectedArtist] = useState<string>("");
   const [pickup, setPickup] = useState<CustomPerformance | null>(null);
   const [isFading, setIsFading] = useState(false);
+
+  const [isMounted, setIsMounted] = useState(false);
+  const [randomOrder, setRandomOrder] = useState<Record<string, number>>({});
+
+  const [sortModalOpen, setSortModalOpen] = useState(false);
+  const [sortConfigSongs, setSortConfigSongs] = useState({ key: 'default', order: 'desc' });
+  const [sortConfigVideos, setSortConfigVideos] = useState({ key: 'default', order: 'desc' });
+  const [tempSortConfig, setTempSortConfig] = useState({ key: 'date', order: 'desc' });
+
+  useEffect(() => {
+    setIsMounted(true);
+    const order: Record<string, number> = {};
+    initialPerformances.forEach(p => { if (p.song) order[p.song.id] = Math.random(); });
+    initialVideos.forEach(v => { order[v.id] = Math.random(); });
+    setRandomOrder(order);
+  }, [initialPerformances, initialVideos]);
 
   const handleTabChange = (tab: 'songs' | 'videos') => {
     setActiveTab(tab);
@@ -82,10 +99,41 @@ export default function ClientSongList({
     setSelectedMonth("");
     setSelectedMembers([]);
     setSelectedType("");
+    setSelectedArtist("");
+    setSortConfigSongs({ key: 'default', order: 'desc' });
+    setSortConfigVideos({ key: 'default', order: 'desc' });
+    setSortModalOpen(false);
+  };
+
+  const openSortModal = () => {
+    const current = activeTab === 'songs' ? sortConfigSongs : sortConfigVideos;
+    setTempSortConfig(current.key === 'default' ? { key: 'date', order: 'desc' } : current);
+    setSortModalOpen(true);
+  };
+
+  const applySort = () => {
+    if (activeTab === 'songs') {
+      setSortConfigSongs(tempSortConfig);
+    } else {
+      setSortConfigVideos(tempSortConfig);
+    }
+    setSortModalOpen(false);
+  };
+
+  const resetSort = () => {
+    const defaultSort = { key: 'default', order: 'desc' };
+    setTempSortConfig({ key: 'date', order: 'desc' });
+    if (activeTab === 'songs') {
+      setSortConfigSongs(defaultSort);
+    } else {
+      setSortConfigVideos(defaultSort);
+    }
+    setSortModalOpen(false);
   };
 
   const availableYears = Array.from(new Set(initialVideos.map(v => new Date(v.streamingDate).getFullYear().toString()))).sort((a, b) => b.localeCompare(a));
   const availableMonths = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
+  const availableArtists = Array.from(new Set(initialPerformances.map(p => p.song?.artist).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'ja'));
 
   const shufflePickup = useCallback(() => {
     if (initialPerformances.length > 0) {
@@ -140,7 +188,21 @@ export default function ClientSongList({
         p.video.title.toLowerCase().includes(term) ||
         p.video.channel?.name?.toLowerCase().includes(term)
       );
-    return group.performances.length > 0 && matchText;
+    const matchArtist = selectedArtist === "" || group.artist === selectedArtist;
+    return group.performances.length > 0 && matchText && matchArtist;
+  }).sort((a, b) => {
+    if (sortConfigSongs.key === 'default') {
+      if (!isMounted) return a.songId.localeCompare(b.songId);
+      return (randomOrder[a.songId] || 0) - (randomOrder[b.songId] || 0);
+    } else if (sortConfigSongs.key === 'date') {
+      const dateA = Math.max(...a.performances.map(p => new Date(p.video.streamingDate).getTime()));
+      const dateB = Math.max(...b.performances.map(p => new Date(p.video.streamingDate).getTime()));
+      return sortConfigSongs.order === 'desc' ? dateB - dateA : dateA - dateB;
+    } else {
+      return sortConfigSongs.order === 'desc'
+        ? b.title.localeCompare(a.title, 'ja')
+        : a.title.localeCompare(b.title, 'ja');
+    }
   });
 
   const filteredVideos = initialVideos.filter((video) => {
@@ -174,6 +236,19 @@ export default function ClientSongList({
       );
 
     return matchMember && matchType && matchYear && matchMonth && matchText;
+  }).sort((a, b) => {
+    if (sortConfigVideos.key === 'default') {
+      if (!isMounted) return a.id.localeCompare(b.id);
+      return (randomOrder[a.id] || 0) - (randomOrder[b.id] || 0);
+    } else if (sortConfigVideos.key === 'date') {
+      const dateA = new Date(a.streamingDate).getTime();
+      const dateB = new Date(b.streamingDate).getTime();
+      return sortConfigVideos.order === 'desc' ? dateB - dateA : dateA - dateB;
+    } else {
+      return sortConfigVideos.order === 'desc'
+        ? b.title.localeCompare(a.title, 'ja')
+        : a.title.localeCompare(b.title, 'ja');
+    }
   });
 
   const renderMemberTags = (singers: string[] | undefined) => {
@@ -197,8 +272,41 @@ export default function ClientSongList({
     });
   };
 
+  const renderSortDropdown = () => (
+    <>
+      <div className="fixed inset-0 z-40" onClick={() => setSortModalOpen(false)}></div>
+      {/* 変更箇所: origin-top-right と zoom-in-95 でボタンから広がるようなアニメーションに */}
+      <div className="absolute right-0 top-[calc(100%+8px)] w-[260px] md:w-[280px] bg-white rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.15)] border border-gray-100 p-4 md:p-5 z-50 origin-top-right transition-all animate-in zoom-in-95 fade-in duration-200">
+        <div className="flex flex-col gap-4 md:gap-5">
+
+          <div className="flex flex-col gap-2">
+            <div className="text-xs md:text-sm font-bold text-indigo-900 ml-1">項目</div>
+            <div className="relative p-1 bg-gray-100 rounded-lg inline-flex justify-center items-center w-full">
+              <div className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-white rounded-md shadow-sm transition-all duration-300 ease-[cubic-bezier(0.4,0.0,0.2,1)] ${tempSortConfig.key === 'title' ? 'left-[calc(50%+2px)]' : 'left-1'}`}></div>
+              <button onClick={() => setTempSortConfig({...tempSortConfig, key: 'date'})} className={`relative z-10 flex-1 h-8 md:h-9 rounded-md flex justify-center items-center cursor-pointer transition-colors duration-300 text-xs md:text-sm font-bold ${tempSortConfig.key !== 'title' ? 'text-indigo-900' : 'text-gray-500 hover:text-gray-700'}`}>配信日</button>
+              <button onClick={() => setTempSortConfig({...tempSortConfig, key: 'title'})} className={`relative z-10 flex-1 h-8 md:h-9 rounded-md flex justify-center items-center cursor-pointer transition-colors duration-300 text-xs md:text-sm font-bold ${tempSortConfig.key === 'title' ? 'text-indigo-900' : 'text-gray-500 hover:text-gray-700'}`}>{activeTab === 'songs' ? 'タイトル' : '配信タイトル'}</button>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <div className="text-xs md:text-sm font-bold text-indigo-900 ml-1">並び順</div>
+            <div className="relative p-1 bg-gray-100 rounded-lg inline-flex justify-center items-center w-full">
+              <div className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-white rounded-md shadow-sm transition-all duration-300 ease-[cubic-bezier(0.4,0.0,0.2,1)] ${tempSortConfig.order === 'asc' ? 'left-[calc(50%+2px)]' : 'left-1'}`}></div>
+              <button onClick={() => setTempSortConfig({...tempSortConfig, order: 'desc'})} className={`relative z-10 flex-1 h-8 md:h-9 rounded-md flex justify-center items-center cursor-pointer transition-colors duration-300 text-xs md:text-sm font-bold ${tempSortConfig.order !== 'asc' ? 'text-indigo-900' : 'text-gray-500 hover:text-gray-700'}`}>降順</button>
+              <button onClick={() => setTempSortConfig({...tempSortConfig, order: 'asc'})} className={`relative z-10 flex-1 h-8 md:h-9 rounded-md flex justify-center items-center cursor-pointer transition-colors duration-300 text-xs md:text-sm font-bold ${tempSortConfig.order === 'asc' ? 'text-indigo-900' : 'text-gray-500 hover:text-gray-700'}`}>昇順</button>
+            </div>
+          </div>
+
+          <div className="flex justify-between items-center pt-1 md:pt-2">
+            <button onClick={resetSort} className="text-xs md:text-sm font-bold text-gray-400 hover:text-gray-600 transition-colors px-2 py-1">ランダムに戻す</button>
+            <button onClick={applySort} className="px-5 md:px-6 py-2 md:py-2.5 bg-gradient-to-br from-indigo-400 to-purple-300 rounded-full text-white text-xs md:text-sm font-bold hover:opacity-90 hover:shadow-md transition-all">並べ替え</button>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+
   return (
-    // フッターに被らないよう pb-28 に変更
     <div className="min-h-screen bg-gray-200 pb-28 relative overflow-x-hidden">
 
       <div className="absolute top-0 left-0 w-full h-[450px] md:h-[500px]">
@@ -280,44 +388,75 @@ export default function ClientSongList({
             </div>
 
             {activeTab === 'songs' ? (
-              <div className="w-full max-w-2xl h-12 md:h-14 px-4 bg-white rounded-full outline outline-[1.5px] outline-offset-[-1.5px] outline-gray-200 flex items-center gap-3 shadow-sm hover:outline-indigo-300 transition-all focus-within:outline-indigo-400">
-                <svg className="w-5 h-5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                <input
-                  type="text"
-                  placeholder="曲名・アーティスト・ゲスト名で検索"
-                  className="bg-transparent border-none outline-none w-full text-gray-700 text-sm md:text-base font-medium"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
+              <div className="w-full max-w-2xl flex flex-col gap-3">
+                <div className="flex gap-2 relative">
+                  <div className="flex-1 h-12 md:h-14 px-4 bg-white rounded-full outline outline-[1.5px] outline-offset-[-1.5px] outline-gray-200 flex items-center gap-3 shadow-sm hover:outline-indigo-300 transition-all focus-within:outline-indigo-400">
+                    <svg className="w-5 h-5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                    <input
+                      type="text"
+                      placeholder="曲名・アーティスト・参加者名などで自由に検索"
+                      className="bg-transparent border-none outline-none w-full text-gray-700 text-sm md:text-base font-medium"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </div>
+                  <button onClick={openSortModal} className={`h-12 w-12 md:h-14 md:w-14 shrink-0 rounded-full outline outline-[1.5px] outline-offset-[-1.5px] flex items-center justify-center shadow-sm transition-all ${sortModalOpen ? 'bg-indigo-50 outline-indigo-300' : 'bg-white outline-gray-200 hover:outline-indigo-300 hover:bg-gray-50'}`}>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`w-5 h-5 md:w-6 md:h-6 ${sortModalOpen ? 'text-indigo-600' : 'text-gray-600'}`}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+                    </svg>
+                  </button>
+                  {sortModalOpen && activeTab === 'songs' && renderSortDropdown()}
+                </div>
+                <div className="h-12 md:h-14 px-4 bg-white rounded-full outline outline-[1.5px] outline-offset-[-1.5px] outline-gray-200 flex items-center gap-2 shadow-sm hover:outline-indigo-300 transition-all focus-within:outline-indigo-400">
+                  <svg className="w-4 h-4 md:w-5 md:h-5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" /></svg>
+                  <select
+                    className="bg-transparent border-none outline-none w-full text-gray-700 text-sm md:text-base font-medium appearance-none cursor-pointer"
+                    value={selectedArtist}
+                    onChange={(e) => setSelectedArtist(e.target.value)}
+                  >
+                    <option value="">すべての原曲アーティスト</option>
+                    {availableArtists.map(artist => (
+                      <option key={artist} value={artist}>{artist}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
             ) : (
-              <div className="w-full max-w-2xl flex gap-3">
-                <div className="flex-1 h-12 md:h-14 px-4 bg-white rounded-full outline outline-[1.5px] outline-offset-[-1.5px] outline-gray-200 flex items-center gap-2 shadow-sm hover:outline-indigo-300 transition-all focus-within:outline-indigo-400">
-                  <svg className="w-4 h-4 md:w-5 md:h-5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                  <select
-                    className="bg-transparent border-none outline-none w-full text-gray-700 text-xs md:text-base font-medium appearance-none cursor-pointer"
-                    value={selectedYear}
-                    onChange={(e) => setSelectedYear(e.target.value)}
-                  >
-                    <option value="">すべての年</option>
-                    {availableYears.map(year => (
-                      <option key={year} value={year}>{year}年</option>
-                    ))}
-                  </select>
+              <div className="w-full max-w-2xl flex gap-2 relative">
+                <div className="flex-1 flex gap-2">
+                  <div className="flex-1 h-12 md:h-14 px-4 bg-white rounded-full outline outline-[1.5px] outline-offset-[-1.5px] outline-gray-200 flex items-center gap-2 shadow-sm hover:outline-indigo-300 transition-all focus-within:outline-indigo-400">
+                    <svg className="w-4 h-4 md:w-5 md:h-5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    <select
+                      className="bg-transparent border-none outline-none w-full text-gray-700 text-xs md:text-base font-medium appearance-none cursor-pointer"
+                      value={selectedYear}
+                      onChange={(e) => setSelectedYear(e.target.value)}
+                    >
+                      <option value="">すべての年</option>
+                      {availableYears.map(year => (
+                        <option key={year} value={year}>{year}年</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex-1 h-12 md:h-14 px-4 bg-white rounded-full outline outline-[1.5px] outline-offset-[-1.5px] outline-gray-200 flex items-center gap-2 shadow-sm hover:outline-indigo-300 transition-all focus-within:outline-indigo-400">
+                    <svg className="w-4 h-4 md:w-5 md:h-5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    <select
+                      className="bg-transparent border-none outline-none w-full text-gray-700 text-xs md:text-base font-medium appearance-none cursor-pointer"
+                      value={selectedMonth}
+                      onChange={(e) => setSelectedMonth(e.target.value)}
+                    >
+                      <option value="">すべての月</option>
+                      {availableMonths.map(month => (
+                        <option key={month} value={month}>{month}月</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
-                <div className="flex-1 h-12 md:h-14 px-4 bg-white rounded-full outline outline-[1.5px] outline-offset-[-1.5px] outline-gray-200 flex items-center gap-2 shadow-sm hover:outline-indigo-300 transition-all focus-within:outline-indigo-400">
-                  <svg className="w-4 h-4 md:w-5 md:h-5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                  <select
-                    className="bg-transparent border-none outline-none w-full text-gray-700 text-xs md:text-base font-medium appearance-none cursor-pointer"
-                    value={selectedMonth}
-                    onChange={(e) => setSelectedMonth(e.target.value)}
-                  >
-                    <option value="">すべての月</option>
-                    {availableMonths.map(month => (
-                      <option key={month} value={month}>{month}月</option>
-                    ))}
-                  </select>
-                </div>
+                <button onClick={openSortModal} className={`h-12 w-12 md:h-14 md:w-14 shrink-0 rounded-full outline outline-[1.5px] outline-offset-[-1.5px] flex items-center justify-center shadow-sm transition-all ${sortModalOpen ? 'bg-indigo-50 outline-indigo-300' : 'bg-white outline-gray-200 hover:outline-indigo-300 hover:bg-gray-50'}`}>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`w-5 h-5 md:w-6 md:h-6 ${sortModalOpen ? 'text-indigo-600' : 'text-gray-600'}`}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+                  </svg>
+                </button>
+                {sortModalOpen && activeTab === 'videos' && renderSortDropdown()}
               </div>
             )}
 
@@ -401,7 +540,7 @@ export default function ClientSongList({
 
                                 <div className="md:hidden shrink-0">
                                   {playButton}
-                                </div>
+                                 </div>
                               </div>
                             </div>
 
@@ -516,12 +655,11 @@ export default function ClientSongList({
         </div>
       </div>
 
-      {/* 固定フッター */}
       <div className="fixed bottom-0 left-0 w-full bg-white/80 backdrop-blur-md border-t border-gray-200 py-2.5 px-4 z-50">
         <div className="max-w-4xl mx-auto text-[10px] text-gray-500 leading-snug flex flex-col gap-0.5">
           <p>※ 当サイトは一ファンが運営する非公式データベースです。ご本人や所属事務所様とは一切関係ありません。(動画・楽曲の権利は各権利者様に帰属します)</p>
           <p>※ 手作業で更新しているため、データの抜け漏れや反映の遅れはご容赦ください🙏 サイトのリンク共有や紹介は大歓迎です！</p>
-          <p>※ 修正依頼やお問い合わせは <a href="https://x.com/asa_go_han_" target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:text-indigo-400 font-bold transition-colors">X（@asa_go_han）</a> までお気軽にどうぞ。</p>
+          <p>※ 修正依頼やお問い合わせは <a href="https://x.com/asa_go_han_" target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:text-indigo-400 font-bold transition-colors">X（@asa_go_han_）</a> までお気軽にどうぞ。</p>
         </div>
       </div>
 
