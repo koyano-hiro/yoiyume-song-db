@@ -1,6 +1,9 @@
 import { client, Performance, Video } from "@/lib/microcms";
 import ClientSongList from "./components/ClientSongList";
 
+// ▼ここを追記：キャッシュを無効化し、常に最新のデータを取得する設定▼
+export const dynamic = "force-dynamic";
+
 async function getInitialData() {
   const [performancesData, videosData] = await Promise.all([
     client.getList<Performance>({ endpoint: "performances", queries: { limit: 100 } }),
