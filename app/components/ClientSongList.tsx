@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import { Performance, Video } from "@/lib/microcms";
 import Image from "next/image";
 
+type CustomPerformance = Performance & { collaborators?: string };
+
 const MEMBERS = [
   {
     name: "十河ののは",
@@ -45,7 +47,6 @@ function formatTime(seconds: number) {
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
-// サーバー/クライアント間で差異が出ないよう手動で日付をフォーマットする関数を追加
 function formatDate(dateStr: string) {
   const d = new Date(dateStr);
   return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}`;
@@ -55,14 +56,14 @@ type GroupedSong = {
   songId: string;
   title: string;
   artist: string;
-  performances: Performance[];
+  performances: CustomPerformance[];
 };
 
 export default function ClientSongList({
   initialPerformances,
   initialVideos
 }: {
-  initialPerformances: Performance[];
+  initialPerformances: CustomPerformance[];
   initialVideos: Video[];
 }) {
   const [activeTab, setActiveTab] = useState<'songs' | 'videos'>('songs');
@@ -71,7 +72,7 @@ export default function ClientSongList({
   const [selectedMonth, setSelectedMonth] = useState("");
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
   const [selectedType, setSelectedType] = useState<string>("");
-  const [pickup, setPickup] = useState<Performance | null>(null);
+  const [pickup, setPickup] = useState<CustomPerformance | null>(null);
   const [isFading, setIsFading] = useState(false);
 
   const handleTabChange = (tab: 'songs' | 'videos') => {
@@ -197,7 +198,8 @@ export default function ClientSongList({
   };
 
   return (
-    <div className="min-h-screen bg-gray-200 pb-20 relative overflow-x-hidden">
+    // フッターに被らないよう pb-28 に変更
+    <div className="min-h-screen bg-gray-200 pb-28 relative overflow-x-hidden">
 
       <div className="absolute top-0 left-0 w-full h-[450px] md:h-[500px]">
         <div className="absolute inset-0 bg-gradient-to-r from-slate-900 to-indigo-900"></div>
@@ -213,7 +215,7 @@ export default function ClientSongList({
         </div>
 
         {pickup && (
-          <div className="w-[90%] md:max-w-4xl mx-auto px-4 py-4 md:py-6 bg-white/95 backdrop-blur-md rounded-2xl flex flex-col justify-start items-start gap-3 shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/50 mb-8 md:mb-12">
+          <div className="w-[90%] md:max-w-4xl mx-auto px-4 py-4 md:py-6 bg-white/95 backdrop-blur-md rounded-2xl flex flex-col justify-start items-start gap-2 md:gap-3 shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/50 mb-8 md:mb-12">
             <div className="w-full flex justify-between items-center">
               <div className="flex justify-start items-center gap-2">
                 <div className="w-5 h-5 md:w-6 md:h-6 relative">
@@ -228,8 +230,8 @@ export default function ClientSongList({
                 <div className="text-white text-xs md:text-sm font-bold leading-4">シャッフル</div>
               </button>
             </div>
-            <div className={`w-full flex flex-row items-start gap-3 md:gap-6 mt-2 transition-opacity duration-300 ease-in-out ${isFading ? 'opacity-0' : 'opacity-100'}`}>
-              <div className="w-2/5 md:w-1/2 aspect-video rounded-lg overflow-hidden bg-black shrink-0 shadow-inner">
+            <div className={`w-full flex flex-col md:flex-row items-start gap-3 md:gap-6 mt-0.5 md:mt-2 transition-opacity duration-300 ease-in-out ${isFading ? 'opacity-0' : 'opacity-100'}`}>
+              <div className="w-full md:w-1/2 aspect-video rounded-lg overflow-hidden bg-black shrink-0 shadow-inner">
                 <iframe
                   key={pickup.id}
                   src={`https://www.youtube.com/embed/${pickup.video.youtubeId}${pickup.startSeconds ? `?start=${pickup.startSeconds}` : ''}`}
@@ -238,10 +240,10 @@ export default function ClientSongList({
                   allowFullScreen
                 />
               </div>
-              <div className="w-3/5 md:w-1/2 flex flex-col justify-start items-start gap-2 md:gap-3">
+              <div className="w-full md:w-1/2 flex flex-col justify-start items-start gap-2 md:gap-3">
                 <div className="flex flex-col gap-1 w-full">
                   <div className="text-neutral-950 text-sm md:text-xl font-bold leading-snug line-clamp-2 md:line-clamp-3">{pickup.song.title}</div>
-                  <div className="text-gray-500 text-[10px] md:text-sm font-normal truncate w-full">Original: {pickup.song.artist}</div>
+                  <div className="text-gray-500 text-[10px] md:text-sm font-normal truncate w-full">{pickup.song.artist}</div>
                 </div>
                 <div className="flex flex-wrap gap-1.5 md:mt-1">
                   {renderMemberTags(pickup.singers)}
@@ -361,40 +363,55 @@ export default function ClientSongList({
                   <div key={group.songId} className="p-4 md:p-6 bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-gray-100 flex flex-col md:flex-row gap-6">
                     <div className="w-full md:w-1/3 flex flex-col">
                       <div className="text-indigo-900 text-lg md:text-xl font-bold leading-tight">{group.title}</div>
-                      <div className="text-gray-500 text-xs md:text-sm font-medium mt-1">Original: {group.artist}</div>
+                      <div className="text-gray-500 text-xs md:text-sm font-medium mt-1">{group.artist}</div>
                     </div>
                     <div className="w-full md:w-2/3 flex flex-col gap-3">
-                      {group.performances.map((perf) => (
-                        <div key={perf.id} className="p-3 md:p-4 bg-neutral-50 rounded-xl flex justify-between items-center gap-3 border border-gray-100 hover:bg-indigo-50/40 transition-colors duration-300">
-                          <div className="flex-1 flex flex-col gap-2">
-                            <div className="flex flex-col md:flex-row md:items-baseline gap-1 md:gap-3">
-                              <div className="text-indigo-900 text-sm md:text-base font-bold leading-snug line-clamp-2">{perf.video.title}</div>
-                              {/* 変更箇所: toLocaleDateString() によるハイドレーションエラーを防止 */}
-                              <div className="text-zinc-500 text-[11px] md:text-xs shrink-0">{formatDate(perf.video.streamingDate)}</div>
-                            </div>
-                            <div className="flex flex-wrap items-center gap-1.5 mt-1">
-                              {renderMemberTags(perf.singers)}
-                              {perf.collaborators && (
-                                <div className="px-1.5 py-1 bg-slate-50 rounded-[120px] outline outline-1 outline-offset-[-1px] outline-slate-300 shadow-sm flex items-center gap-1">
-                                  <div className="text-center text-[10px] md:text-xs font-bold text-slate-700">🤝 {perf.collaborators}</div>
+                      {group.performances.map((perf) => {
+                        const playButton = perf.video.isArchived ? (
+                          <a href={`https://youtu.be/${perf.video.youtubeId}${perf.startSeconds ? `?t=${perf.startSeconds}` : ''}`} target="_blank" rel="noopener noreferrer" className="h-8 md:h-9 px-6 bg-red-500 hover:bg-red-600 hover:scale-105 transition-all duration-300 rounded-full flex items-center justify-center shrink-0 shadow-sm">
+                            <svg className="w-4 h-4 md:w-5 md:h-5 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+                          </a>
+                        ) : (
+                          <div className="h-8 md:h-9 px-3 bg-gray-300 rounded-full flex items-center justify-center shrink-0">
+                            <div className="text-white text-[10px] md:text-xs font-bold whitespace-nowrap">アーカイブ非公開</div>
+                          </div>
+                        );
+
+                        return (
+                          <div key={perf.id} className="p-3 md:p-4 bg-neutral-50 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-2 md:gap-3 border border-gray-100 hover:bg-indigo-50/40 transition-colors duration-300">
+
+                            <div className="w-full flex-1 flex flex-col gap-2">
+                              <div className="flex flex-col gap-0.5 md:gap-1">
+                                <div className="text-indigo-900 text-sm md:text-base font-bold leading-snug line-clamp-1 md:line-clamp-2">{perf.video.title}</div>
+                                <div className="text-zinc-500 text-[11px] md:text-xs">{formatDate(perf.video.streamingDate)}</div>
+                              </div>
+
+                              <div className="w-full flex flex-row justify-between items-end md:items-center gap-3">
+                                <div className="flex flex-wrap items-center gap-1.5 md:mt-1">
+                                  {renderMemberTags(perf.singers)}
+                                  {perf.collaborators && (
+                                    <div className="px-1.5 py-1 bg-slate-50 rounded-[120px] outline outline-1 outline-offset-[-1px] outline-slate-300 shadow-sm flex items-center gap-1">
+                                      <div className="text-center text-[10px] md:text-xs font-bold text-slate-700">🤝 {perf.collaborators}</div>
+                                    </div>
+                                  )}
+                                  <div className="px-2 py-1 bg-white rounded border border-gray-200">
+                                    <div className="text-gray-600 text-[10px] md:text-xs font-bold">{perf.video.type[0]}</div>
+                                  </div>
                                 </div>
-                              )}
-                              <div className="px-2 py-1 bg-white rounded border border-gray-200">
-                                <div className="text-gray-600 text-[10px] md:text-xs font-bold">{perf.video.type[0]}</div>
+
+                                <div className="md:hidden shrink-0">
+                                  {playButton}
+                                </div>
                               </div>
                             </div>
-                          </div>
-                          {perf.video.isArchived ? (
-                            <a href={`https://youtu.be/${perf.video.youtubeId}${perf.startSeconds ? `?t=${perf.startSeconds}` : ''}`} target="_blank" rel="noopener noreferrer" className="h-8 md:h-9 px-6 bg-red-500 hover:bg-red-600 hover:scale-105 transition-all duration-300 rounded-full flex items-center justify-center shrink-0 shadow-sm">
-                              <svg className="w-4 h-4 md:w-5 md:h-5 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
-                            </a>
-                          ) : (
-                            <div className="h-8 md:h-9 px-3 bg-gray-300 rounded-full flex items-center shrink-0">
-                              <div className="text-white text-[10px] md:text-xs font-bold">アーカイブ非公開</div>
+
+                            <div className="hidden md:flex shrink-0">
+                              {playButton}
                             </div>
-                          )}
-                        </div>
-                      ))}
+
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 ))}
@@ -434,7 +451,6 @@ export default function ClientSongList({
                             <div className="px-2 py-1 bg-neutral-100 rounded border border-gray-200 shadow-sm">
                               <div className="text-gray-700 text-[10px] md:text-xs font-bold">{video.type[0]}</div>
                             </div>
-                            {/* 変更箇所: toLocaleDateString() によるハイドレーションエラーを防止 */}
                             <div className="text-zinc-500 text-xs md:text-sm">{formatDate(video.streamingDate)}</div>
                           </div>
                           <div className="mt-1 flex items-center gap-1 truncate">
@@ -479,8 +495,8 @@ export default function ClientSongList({
                                     </a>
                                   )
                                 ) : (
-                                  <div className="h-8 md:h-9 px-3 bg-gray-300 rounded-full flex items-center shrink-0">
-                                    <div className="text-white text-[10px] md:text-xs font-bold">アーカイブ非公開</div>
+                                  <div className="h-8 md:h-9 px-3 bg-gray-300 rounded-full flex items-center justify-center shrink-0">
+                                    <div className="text-white text-[10px] md:text-xs font-bold whitespace-nowrap">アーカイブ非公開</div>
                                   </div>
                                 )}
                               </div>
@@ -499,6 +515,16 @@ export default function ClientSongList({
           </div>
         </div>
       </div>
+
+      {/* 固定フッター */}
+      <div className="fixed bottom-0 left-0 w-full bg-white/80 backdrop-blur-md border-t border-gray-200 py-2.5 px-4 z-50">
+        <div className="max-w-4xl mx-auto text-[10px] text-gray-500 leading-snug flex flex-col gap-0.5">
+          <p>※ 当サイトは一ファンが運営する非公式データベースです。ご本人や所属事務所様とは一切関係ありません。(動画・楽曲の権利は各権利者様に帰属します)</p>
+          <p>※ 手作業で更新しているため、データの抜け漏れや反映の遅れはご容赦ください🙏 サイトのリンク共有や紹介は大歓迎です！</p>
+          <p>※ 修正依頼やお問い合わせは <a href="https://x.com/asa_go_han_" target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:text-indigo-400 font-bold transition-colors">X（@asa_go_han）</a> までお気軽にどうぞ。</p>
+        </div>
+      </div>
+
     </div>
   );
 }
