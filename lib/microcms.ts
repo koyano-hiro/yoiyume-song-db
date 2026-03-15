@@ -20,6 +20,7 @@ export type Video = {
   isArchived: boolean;
   type: string[];
   channel?: Channel; // 文字列からChannel型への参照に変更
+  isShorts?: boolean; // ← 【追加】Shorts判定用のプロパティ
 };
 
 export type Song = {
