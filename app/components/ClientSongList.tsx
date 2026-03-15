@@ -72,8 +72,11 @@ export default function ClientSongList({
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
+
       const tabParam = params.get('tab');
-      if (tabParam === 'songs' || tabParam === 'videos') setActiveTab(tabParam);
+      if (tabParam === 'songs' || tabParam === 'videos') {
+        setActiveTab(tabParam);
+      }
 
       if (params.get('q')) setSearchTerm(params.get('q') || '');
       if (params.get('year')) setSelectedYear(params.get('year') || '');
@@ -82,12 +85,16 @@ export default function ClientSongList({
       if (params.get('type')) setSelectedType(params.get('type') || '');
       if (params.get('artist')) setSelectedArtist(params.get('artist') || '');
 
-      // 型安全なパラメータ復元
+      // ビルドエラー（any型エラー）を回避するための型安全な判定処理
       const perfParam = params.get('perf');
-      if (perfParam === 'all' || perfParam === 'vocal' || perfParam === 'inst') setPerformanceMode(perfParam);
+      if (perfParam === 'all' || perfParam === 'vocal' || perfParam === 'inst') {
+        setPerformanceMode(perfParam);
+      }
 
       const shortsParam = params.get('shorts');
-      if (shortsParam === 'all' || shortsParam === 'normal' || shortsParam === 'shorts') setShortsMode(shortsParam);
+      if (shortsParam === 'all' || shortsParam === 'normal' || shortsParam === 'shorts') {
+        setShortsMode(shortsParam);
+      }
     }
   }, []);
 
@@ -365,8 +372,10 @@ export default function ClientSongList({
             <div className="w-full -mt-[2px] relative z-20">
               <div className="w-full bg-white border-y-[2px] border-[#1C1C1C] py-3 md:py-4 flex flex-col gap-2 relative">
 
-                <img src="/icon-pickup.png" className="absolute top-[0px] left-0 md:left-[-2px] w-12 h-12 md:w-16 md:h-16 object-contain object-left-top" alt="" />
+                {/* top-0 に変更し、上部の黒いボーダーが見えるように調整 */}
+                <img src="/icon-pickup.png" className="absolute top-0 left-0 md:left-[-2px] w-12 h-12 md:w-16 md:h-16 object-contain object-left-top" alt="" />
 
+                {/* pr-4 pl-[3.5rem] の非対称な余白をタイトル行のみに限定 */}
                 <div className="w-full flex justify-between items-center min-h-[32px] md:min-h-[40px] pr-4 pl-[3.5rem] md:pr-6 md:pl-[4.5rem]">
                   <div className="flex justify-start items-baseline gap-1.5 md:gap-2">
                     <div className="text-[#1C1C1C] text-xl md:text-2xl font-black tracking-tight leading-none mt-0.5">PICK UP</div>
@@ -379,8 +388,9 @@ export default function ClientSongList({
                   </button>
                 </div>
 
+                {/* コンテンツ行は左右均等な余白(px-4 md:px-6)に変更 */}
                 <div className={`w-full flex flex-col md:flex-row items-start gap-4 px-4 md:px-6 transition-opacity duration-300 ease-in-out ${isFading ? 'opacity-0' : 'opacity-100'}`}>
-                  <div className="w-full md:w-1/2 aspect-video rounded-xl overflow-hidden bg-black shrink-0">
+                  <div className="w-full md:w-1/2 aspect-video rounded-xl overflow-hidden bg-black shrink-0 border-[2px] border-[#1C1C1C]">
                     <iframe
                       key={pickup.id}
                       src={`https://www.youtube.com/embed/${pickup.video.youtubeId}${pickup.startSeconds ? `?start=${pickup.startSeconds}` : ''}`}
@@ -398,13 +408,13 @@ export default function ClientSongList({
                       {pickup.singers?.map(singer => {
                         const memberDef = MEMBERS.find(m => m.name === singer);
                         return (
-                          <div key={singer} className="px-1.5 py-[1px] rounded text-[9px] md:text-[10px] font-bold text-[#1C1C1C]" style={{ backgroundColor: memberDef?.color || '#D2DBF8' }}>
+                          <div key={singer} className="px-1.5 py-[1px] rounded text-[9px] md:text-[10px] font-bold text-[#1C1C1C]" style={{ backgroundColor: memberDef?.color || '#FFFFFF' }}>
                             {memberDef?.emoji} {singer}
                           </div>
                         );
                       })}
                       {pickup.collaborators && (
-                        <div className="px-1.5 py-[1px] bg-[#D2DBF8] rounded text-[#1C1C1C] text-[9px] md:text-[10px] font-bold">
+                        <div className="px-1.5 py-[1px] bg-gray-100 rounded text-[9px] md:text-[10px] font-bold text-[#1C1C1C]">
                           🤝 {pickup.collaborators}
                         </div>
                       )}
@@ -439,6 +449,7 @@ export default function ClientSongList({
             <div className="w-full flex flex-col gap-3">
 
               <div className="flex gap-2 relative">
+                {/* 検索窓（画像＋入力欄） */}
                 <div className="flex-1 h-12 bg-white rounded-xl border-[2px] border-[#1C1C1C] flex items-center overflow-hidden">
                   <img src="/icon-search.png" className="h-full w-auto object-cover shrink-0" alt="" />
                   <input
@@ -524,28 +535,30 @@ export default function ClientSongList({
                 })}
               </div>
 
-              <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 w-full">
+              <div className="flex flex-col gap-2 w-full">
                 {activeTab === 'songs' ? (
-                  <div className="relative flex w-full md:w-[240px] h-9 border-[2px] border-[#1C1C1C] rounded-md bg-white shadow-[2px_2px_0px_#1C1C1C] overflow-hidden shrink-0">
-                    <div
-                      className="absolute top-[0px] bottom-[0px] left-[0px] w-[calc(33.333%+2px)] bg-[#1C1C1C] transition-transform duration-300 ease-in-out"
-                      style={{ transform: performanceMode === 'all' ? 'translateX(-2px)' : performanceMode === 'vocal' ? 'translateX(calc(100% - 4px))' : 'translateX(calc(200% - 6px))' }}
-                    />
-                    <button
-                      onClick={() => setPerformanceMode('all')}
-                      className={`relative z-10 flex-1 flex justify-center items-center text-xs font-bold transition-colors border-r-[2px] border-[#1C1C1C] ${performanceMode === 'all' ? 'text-white border-transparent' : 'text-[#1C1C1C] hover:bg-gray-100'}`}
-                    >すべて</button>
-                    <button
-                      onClick={() => setPerformanceMode('vocal')}
-                      className={`relative z-10 flex-1 flex justify-center items-center text-xs font-bold transition-colors border-r-[2px] border-[#1C1C1C] ${performanceMode === 'vocal' ? 'text-white border-transparent' : 'text-[#1C1C1C] hover:bg-gray-100'}`}
-                    >歌</button>
-                    <button
-                      onClick={() => setPerformanceMode('inst')}
-                      className={`relative z-10 flex-1 flex justify-center items-center text-xs font-bold transition-colors ${performanceMode === 'inst' ? 'text-white border-transparent' : 'text-[#1C1C1C] hover:bg-gray-100'}`}
-                    >演奏</button>
+                  <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 w-full">
+                    <div className="relative flex w-full md:w-[240px] h-9 border-[2px] border-[#1C1C1C] rounded-md bg-white shadow-[2px_2px_0px_#1C1C1C] overflow-hidden shrink-0">
+                      <div
+                        className="absolute top-[0px] bottom-[0px] left-[0px] w-[calc(33.333%+2px)] bg-[#1C1C1C] transition-transform duration-300 ease-in-out"
+                        style={{ transform: performanceMode === 'all' ? 'translateX(-2px)' : performanceMode === 'vocal' ? 'translateX(calc(100% - 4px))' : 'translateX(calc(200% - 6px))' }}
+                      />
+                      <button
+                        onClick={() => setPerformanceMode('all')}
+                        className={`relative z-10 flex-1 flex justify-center items-center text-xs font-bold transition-colors border-r-[2px] border-[#1C1C1C] ${performanceMode === 'all' ? 'text-white border-transparent' : 'text-[#1C1C1C] hover:bg-gray-100'}`}
+                      >すべて</button>
+                      <button
+                        onClick={() => setPerformanceMode('vocal')}
+                        className={`relative z-10 flex-1 flex justify-center items-center text-xs font-bold transition-colors border-r-[2px] border-[#1C1C1C] ${performanceMode === 'vocal' ? 'text-white border-transparent' : 'text-[#1C1C1C] hover:bg-gray-100'}`}
+                      >歌</button>
+                      <button
+                        onClick={() => setPerformanceMode('inst')}
+                        className={`relative z-10 flex-1 flex justify-center items-center text-xs font-bold transition-colors ${performanceMode === 'inst' ? 'text-white border-transparent' : 'text-[#1C1C1C] hover:bg-gray-100'}`}
+                      >演奏</button>
+                    </div>
                   </div>
                 ) : (
-                  <>
+                  <div className="flex flex-col gap-2 w-full">
                     <div className="grid grid-cols-3 sm:flex sm:flex-nowrap items-center gap-2 w-full">
                       {VIDEO_TYPES.map((type) => {
                         const isActive = selectedType === type;
@@ -560,7 +573,7 @@ export default function ClientSongList({
                         );
                       })}
                     </div>
-                    <div className="relative flex w-full md:w-[320px] h-9 border-[2px] border-[#1C1C1C] rounded-md bg-white shadow-[2px_2px_0px_#1C1C1C] overflow-hidden shrink-0 mt-1 md:mt-0 md:ml-1">
+                    <div className="relative flex w-full md:w-[320px] h-9 border-[2px] border-[#1C1C1C] rounded-md bg-white shadow-[2px_2px_0px_#1C1C1C] overflow-hidden shrink-0 mt-1 md:mt-0">
                       <div
                         className="absolute top-[0px] bottom-[0px] left-[0px] w-[calc(33.333%)] bg-[#1C1C1C] transition-transform duration-300 ease-in-out"
                         style={{ transform: shortsMode === 'all' ? 'translateX(0)' : shortsMode === 'normal' ? 'translateX(100%)' : 'translateX(200%)' }}
@@ -578,7 +591,7 @@ export default function ClientSongList({
                         className={`relative z-10 flex-1 flex justify-center items-center text-xs font-bold transition-colors ${shortsMode === 'shorts' ? 'text-white border-transparent' : 'text-[#1C1C1C] hover:bg-gray-100'}`}
                       >Shortsのみ</button>
                     </div>
-                  </>
+                  </div>
                 )}
               </div>
             </div>
