@@ -9,8 +9,8 @@ const ibmPlexSansJp = IBM_Plex_Sans_JP({
 });
 
 export const metadata: Metadata = {
-  title: "よいゆめの歌と演奏を探すデータベース",
-  description: "非公式ファンサイト",
+  title: "よいゆめの歌と演奏を探せるページ │ 非公式ファンサイト",
+  description: "",
 };
 
 export default function RootLayout({

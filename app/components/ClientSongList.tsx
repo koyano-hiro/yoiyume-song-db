@@ -236,13 +236,13 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
         <div className="relative z-10 w-full flex flex-col flex-grow">
           {pickup && (
             <div className="w-full -mt-[2px] relative z-20">
-              <div className="w-full bg-white border-y-[2px] border-[#1C1C1C] py-3 md:py-4 flex flex-col gap-2 relative">
-                <img src="/icon-pickup.png" className="absolute top-0 left-0 md:left-[-2px] w-12 h-12 md:w-16 md:h-16 object-contain object-left-top" alt="" />
+              <div className="w-full bg-white border-y-[2px] border-[#1C1C1C] pt-1.5 pb-3 md:pt-2 md:pb-4 flex flex-col gap-2 relative">
+                <img src="/icon-pickup.png" className="absolute top-0 left-0 md:left-[-2px] w-9 h-9 md:w-12 md:h-12 object-contain object-left-top" alt="" />
 
-                <div className="w-full flex justify-between items-center min-h-[32px] md:min-h-[40px] pr-4 pl-[3.5rem] md:pr-6 md:pl-[4.5rem]">
+                <div className="w-full flex justify-between items-center min-h-[28px] md:min-h-[32px] pr-4 pl-[2.75rem] md:pr-6 md:pl-[3.5rem]">
                   <div className="flex justify-start items-baseline gap-1.5 md:gap-2">
-                    <div className="text-[#1C1C1C] text-xl md:text-2xl font-black tracking-tight leading-none mt-0.5">PICK UP</div>
-                    <span className="text-gray-500 text-[10px] md:text-xs font-bold leading-none mt-1">ランダムで表示中</span>
+                    <div className="text-[#1C1C1C] text-base md:text-xl font-black tracking-tight leading-none mt-0.5">PICK UP</div>
+                    <span className="text-gray-500 text-[9px] md:text-[10px] font-bold leading-none mt-1">ランダムで表示中</span>
                   </div>
                   <button onClick={shufflePickup} className="px-3 py-1.5 bg-white border-[2px] border-[#1C1C1C] shadow-[2px_2px_0px_#1C1C1C] rounded-full flex items-center gap-1.5 hover:translate-y-[1px] hover:translate-x-[1px] hover:shadow-none transition-all">
                     <img src="/icon-shuffle.png" className="w-3 h-3 md:w-4 md:h-4 object-contain" alt="" />
@@ -250,10 +250,10 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
                   </button>
                 </div>
 
-                <div className={`w-full flex flex-row items-start md:items-center gap-3 md:gap-4 px-4 md:px-6 transition-opacity duration-300 ease-in-out ${isFading ? 'opacity-0' : 'opacity-100'}`}>
-                  <div className="w-[45%] md:w-1/2 lg:w-[480px] aspect-video rounded-xl overflow-hidden bg-black shrink-0 border-[2px] border-[#1C1C1C]">
+                <div className={`w-full flex flex-row items-center gap-3 md:gap-4 px-4 md:px-6 transition-opacity duration-300 ease-in-out ${isFading ? 'opacity-0' : 'opacity-100'}`}>
+                  <div className="w-2/3 md:w-1/2 lg:w-[480px] aspect-video rounded-xl overflow-hidden bg-black shrink-0 border-[2px] border-[#1C1C1C]">
                     {playingVideo?.id === `pickup-${pickup.video.id}` ? (
-                      <iframe id={`yt-pickup-${pickup.video.id}`} src={`https://www.youtube.com/embed/${pickup.video.youtubeId}?autoplay=1&enablejsapi=1${pickup.startSeconds ? `&start=${pickup.startSeconds}` : ''}`} title={pickup.song.title} className="w-full h-full border-0" allow="autoplay; encrypted-media" allowFullScreen />
+                      <iframe id={`yt-pickup-${pickup.video.id}`} src={`https://www.youtube.com/embed/${pickup.video.youtubeId}?autoplay=1&enablejsapi=1&playsinline=1${pickup.startSeconds ? `&start=${pickup.startSeconds}` : ''}`} title={pickup.song.title} className="w-full h-full border-0" allow="autoplay; encrypted-media" allowFullScreen playsInline />
                     ) : (
                       <div className="relative w-full h-full cursor-pointer" onClick={() => setPlayingVideo({ id: `pickup-${pickup.video.id}`, startSeconds: pickup.startSeconds || null, isPaused: false })}>
                         <img src={`https://img.youtube.com/vi/${pickup.video.youtubeId}/maxresdefault.jpg`} onError={(e) => { e.currentTarget.src = `https://img.youtube.com/vi/${pickup.video.youtubeId}/hqdefault.jpg`; }} alt={pickup.song.title} className="w-full h-full object-cover opacity-95" />
@@ -261,7 +261,7 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
                       </div>
                     )}
                   </div>
-                  <div className="flex-1 flex flex-col justify-start md:justify-center items-start overflow-hidden py-1 w-full">
+                  <div className="flex-1 flex flex-col justify-center items-start overflow-hidden py-1 w-full">
                     <div className="flex flex-col gap-0 w-full mb-1.5">
                       <div className="text-[#1C1C1C] text-sm md:text-lg font-bold leading-snug line-clamp-2 mb-0.5">{pickup.song.title}</div>
                       <div className="text-gray-600 text-[10px] md:text-xs font-normal truncate w-full">{pickup.song.artist}</div>
@@ -308,12 +308,12 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
           )}
 
           <div className="w-full px-4 md:px-6 pt-6 pb-28 flex flex-col items-center">
-            <div className="relative rounded-full bg-white flex w-full md:max-w-[500px] h-12 md:h-14 items-center mb-1 border-[2px] border-[#1C1C1C] overflow-hidden">
+            <div className="relative rounded-full bg-white flex w-full md:max-w-[500px] h-9 md:h-10 items-center mb-1 border-[2px] border-[#1C1C1C] overflow-hidden">
               <div className={`absolute top-[-2px] bottom-[-2px] left-[0px] w-[calc(50%+2px)] bg-[#F3F3F3] rounded-full border-[2px] border-[#1C1C1C] shadow-[2px_1px_0px_#1C1C1C] transition-transform duration-300 ease-[cubic-bezier(0.4,0.0,0.2,1)]`} style={{ transform: activeTab === 'songs' ? 'translateX(-2px)' : 'translateX(calc(100% - 4px))' }} />
-              <button onClick={() => handleTabChange('songs')} className={`relative z-10 flex-1 h-full flex justify-center items-center gap-1 md:gap-2 font-bold text-sm md:text-base transition-colors duration-300 ${activeTab === 'songs' ? 'text-[#1C1C1C]' : 'text-gray-500 hover:text-[#1C1C1C]'}`}>
+              <button onClick={() => handleTabChange('songs')} className={`relative z-10 flex-1 h-full flex justify-center items-center gap-1 md:gap-2 font-bold text-[11px] md:text-xs transition-colors duration-300 ${activeTab === 'songs' ? 'text-[#1C1C1C]' : 'text-gray-500 hover:text-[#1C1C1C]'}`}>
                 曲から探す
               </button>
-              <button onClick={() => handleTabChange('videos')} className={`relative z-10 flex-1 h-full flex justify-center items-center gap-1 md:gap-2 font-bold text-sm md:text-base transition-colors duration-300 ${activeTab === 'videos' ? 'text-[#1C1C1C]' : 'text-gray-500 hover:text-[#1C1C1C]'}`}>
+              <button onClick={() => handleTabChange('videos')} className={`relative z-10 flex-1 h-full flex justify-center items-center gap-1 md:gap-2 font-bold text-[11px] md:text-xs transition-colors duration-300 ${activeTab === 'videos' ? 'text-[#1C1C1C]' : 'text-gray-500 hover:text-[#1C1C1C]'}`}>
                 配信・動画から探す
               </button>
             </div>
@@ -324,17 +324,18 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
 
             <div className="w-full flex flex-col gap-3">
               <div className="flex gap-2 relative">
-                <div className="flex-1 h-12 bg-white rounded-xl border-[2px] border-[#1C1C1C] flex items-center overflow-hidden">
+                <div className="flex-1 h-9 bg-white rounded-lg border-[2px] border-[#1C1C1C] flex items-center overflow-hidden">
                   <img src="/icon-search.png" className="h-full w-auto object-cover shrink-0" alt="" />
-                  <input type="text" placeholder={activeTab === 'songs' ? "曲名・アーティスト・コラボ相手で検索" : "配信・動画タイトルで検索"} className="bg-transparent border-none outline-none w-full text-[#1C1C1C] text-sm font-bold placeholder-gray-400 px-3" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+                  <input type="text" placeholder={activeTab === 'songs' ? "曲名・アーティスト・コラボ相手で検索" : "配信・動画タイトルで検索"} className="bg-transparent border-none outline-none w-full text-[#1C1C1C] text-[11px] md:text-xs font-bold placeholder:font-normal placeholder-gray-400 px-3" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
                 </div>
-                <button onClick={openSortModal} className={`h-12 w-12 shrink-0 rounded-xl border-[2px] border-[#1C1C1C] flex items-center justify-center transition-all ${sortModalOpen ? 'bg-gray-100 translate-y-[2px] translate-x-[2px] shadow-none' : 'bg-white shadow-[2px_2px_0px_#1C1C1C] hover:translate-y-[1px] hover:translate-x-[1px] hover:shadow-none'}`}>
+                <button onClick={openSortModal} className={`h-9 w-9 shrink-0 rounded-lg border-[2px] border-[#1C1C1C] flex items-center justify-center transition-all ${sortModalOpen ? 'bg-gray-100 translate-y-[2px] translate-x-[2px] shadow-none' : 'bg-white shadow-[2px_2px_0px_#1C1C1C] hover:translate-y-[1px] hover:translate-x-[1px] hover:shadow-none'}`}>
                   {SearchIcon}
                 </button>
                 {sortModalOpen && (
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setSortModalOpen(false)}></div>
-                    <div className="absolute right-0 top-[calc(100%+8px)] w-[260px] md:w-[280px] bg-white rounded-xl border-[2px] border-[#1C1C1C] p-4 md:p-5 z-50 origin-top-right transition-all animate-in zoom-in-95 fade-in duration-200 shadow-[4px_4px_0px_#1C1C1C]">
+                    <div className="absolute right-0 top-[calc(100%+8px)] w-[260px] md:w-[280px] bg-white rounded-xl border-[2px] border-[#1C1C1C] p-4 md:p-5 z-50 origin-top-right" style={{ animation: 'sortPopIn 200ms cubic-bezier(0.16, 1, 0.3, 1) forwards' }}>
+                      <style dangerouslySetInnerHTML={{__html: `@keyframes sortPopIn { from { opacity: 0; transform: scale(0.95) translateY(-4px); } to { opacity: 1; transform: scale(1) translateY(0); } }`}} />
                       <div className="flex flex-col gap-4 md:gap-5">
                         <div className="flex flex-col gap-2">
                           <div className="text-xs md:text-sm font-bold text-[#1C1C1C] ml-1">📌 項目</div>
@@ -367,25 +368,25 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
               </div>
 
               {activeTab === 'songs' ? (
-                <div className="h-12 bg-white rounded-xl border-[2px] border-[#1C1C1C] flex items-center shadow-[2px_2px_0px_#1C1C1C] hover:translate-y-[1px] hover:translate-x-[1px] hover:shadow-none transition-all cursor-pointer overflow-hidden">
+                <div className="h-9 bg-white rounded-lg border-[2px] border-[#1C1C1C] flex items-center shadow-[2px_2px_0px_#1C1C1C] hover:translate-y-[1px] hover:translate-x-[1px] hover:shadow-none transition-all cursor-pointer overflow-hidden">
                   <img src="/icon-filter-artist.png" className="h-full w-auto object-cover shrink-0" alt="" />
-                  <select className="bg-transparent border-none outline-none w-full text-[#1C1C1C] text-sm font-bold appearance-none cursor-pointer px-3" value={selectedArtist} onChange={(e) => setSelectedArtist(e.target.value)}>
+                  <select className="bg-transparent border-none outline-none w-full text-[#1C1C1C] text-[11px] md:text-xs font-bold appearance-none cursor-pointer px-3" value={selectedArtist} onChange={(e) => setSelectedArtist(e.target.value)}>
                     <option value="">すべての原曲アーティスト</option>
                     {availableArtists.map(artist => <option key={artist} value={artist}>{artist}</option>)}
                   </select>
                 </div>
               ) : (
                 <div className="flex gap-2">
-                  <div className="flex-1 h-12 bg-white rounded-xl border-[2px] border-[#1C1C1C] flex items-center shadow-[2px_2px_0px_#1C1C1C] hover:translate-y-[1px] hover:translate-x-[1px] hover:shadow-none transition-all cursor-pointer overflow-hidden">
+                  <div className="flex-1 h-9 bg-white rounded-lg border-[2px] border-[#1C1C1C] flex items-center shadow-[2px_2px_0px_#1C1C1C] hover:translate-y-[1px] hover:translate-x-[1px] hover:shadow-none transition-all cursor-pointer overflow-hidden">
                     <img src="/icon-filter-calendar.png" className="h-full w-auto object-cover shrink-0" alt="" />
-                    <select className="bg-transparent border-none outline-none w-full text-[#1C1C1C] text-xs md:text-sm font-bold appearance-none cursor-pointer px-2 md:px-3" value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)}>
+                    <select className="bg-transparent border-none outline-none w-full text-[#1C1C1C] text-[11px] md:text-xs font-bold appearance-none cursor-pointer px-2 md:px-3" value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)}>
                       <option value="">すべての年</option>
                       {availableYears.map(year => <option key={year} value={year}>{year}年</option>)}
                     </select>
                   </div>
-                  <div className="flex-1 h-12 bg-white rounded-xl border-[2px] border-[#1C1C1C] flex items-center shadow-[2px_2px_0px_#1C1C1C] hover:translate-y-[1px] hover:translate-x-[1px] hover:shadow-none transition-all cursor-pointer overflow-hidden">
+                  <div className="flex-1 h-9 bg-white rounded-lg border-[2px] border-[#1C1C1C] flex items-center shadow-[2px_2px_0px_#1C1C1C] hover:translate-y-[1px] hover:translate-x-[1px] hover:shadow-none transition-all cursor-pointer overflow-hidden">
                     <img src="/icon-filter-calendar.png" className="h-full w-auto object-cover shrink-0" alt="" />
-                    <select className="bg-transparent border-none outline-none w-full text-[#1C1C1C] text-xs md:text-sm font-bold appearance-none cursor-pointer px-2 md:px-3" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)}>
+                    <select className="bg-transparent border-none outline-none w-full text-[#1C1C1C] text-[11px] md:text-xs font-bold appearance-none cursor-pointer px-2 md:px-3" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)}>
                       <option value="">すべての月</option>
                       {availableMonths.map(month => <option key={month} value={month}>{month}月</option>)}
                     </select>
@@ -417,8 +418,8 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
                   <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 w-full">
                     <div className="relative flex w-full md:w-[240px] h-9 border-[2px] border-[#1C1C1C] rounded-md bg-white shadow-[2px_2px_0px_#1C1C1C] overflow-hidden shrink-0">
                       <div className="absolute top-[0px] bottom-[0px] left-[0px] w-[calc(33.333%+2px)] bg-[#1C1C1C] transition-transform duration-300 ease-in-out" style={{ transform: performanceMode === 'all' ? 'translateX(-2px)' : performanceMode === 'vocal' ? 'translateX(calc(100% - 4px))' : 'translateX(calc(200% - 6px))' }} />
-                      <button onClick={() => setPerformanceMode('all')} className={`relative z-10 flex-1 flex justify-center items-center text-xs font-bold transition-colors ${performanceMode === 'all' ? 'text-white' : 'text-[#1C1C1C] hover:bg-gray-100'}`}>すべて</button>
-                      <button onClick={() => setPerformanceMode('vocal')} className={`relative z-10 flex-1 flex justify-center items-center text-xs font-bold transition-colors ${performanceMode === 'vocal' ? 'text-white' : 'text-[#1C1C1C] hover:bg-gray-100'}`}>歌</button>
+                      <button onClick={() => setPerformanceMode('all')} className={`relative z-10 flex-1 flex justify-center items-center text-xs font-bold transition-colors border-r-[1px] border-[#1C1C1C] ${performanceMode === 'all' ? 'text-white' : 'text-[#1C1C1C] hover:bg-gray-100'}`}>すべて</button>
+                      <button onClick={() => setPerformanceMode('vocal')} className={`relative z-10 flex-1 flex justify-center items-center text-xs font-bold transition-colors border-r-[1px] border-[#1C1C1C] ${performanceMode === 'vocal' ? 'text-white' : 'text-[#1C1C1C] hover:bg-gray-100'}`}>歌</button>
                       <button onClick={() => setPerformanceMode('inst')} className={`relative z-10 flex-1 flex justify-center items-center text-xs font-bold transition-colors ${performanceMode === 'inst' ? 'text-white' : 'text-[#1C1C1C] hover:bg-gray-100'}`}>演奏</button>
                     </div>
                   </div>
@@ -440,9 +441,9 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
                       <button onClick={() => setShortsMode(shortsMode === 'shorts' ? 'all' : 'shorts')} className={`h-9 px-3 rounded-md flex-shrink-0 flex justify-center items-center font-bold text-[11px] md:text-xs transition-all border-[2px] border-dashed border-[#1C1C1C] ${shortsMode === 'shorts' ? 'bg-[#1C1C1C] text-white shadow-none translate-y-[1px] translate-x-[1px]' : 'bg-white text-[#1C1C1C] shadow-[2px_2px_0px_#1C1C1C] hover:translate-y-[1px] hover:translate-x-[1px] hover:shadow-none'}`}>
                         Shortsのみ
                       </button>
-                      <div className="w-6 shrink-0"></div>
+                      <div className="w-4 shrink-0"></div>
                     </div>
-                    <div className="absolute right-0 top-0 bottom-2 w-8 bg-gradient-to-l from-[#F3F3F3] to-transparent pointer-events-none"></div>
+                    <div className="absolute right-0 top-0 bottom-0 w-10 bg-gradient-to-l from-[#F3F3F3] via-[#F3F3F3]/70 to-transparent pointer-events-none"></div>
                   </div>
                 )}
               </div>
@@ -474,7 +475,7 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
                         </a>
                       );
                       return (
-                        <div key={perf.id} className={`px-3 py-3 flex flex-col justify-between items-start gap-2 md:gap-3 bg-[#FFFFFF] hover:bg-orange-50 transition-colors ${index !== group.performances.length - 1 ? 'border-b-[2px] border-[#1C1C1C] border-dashed' : ''}`}>
+                        <div key={perf.id} className={`px-3 py-3 flex flex-col justify-between items-start gap-2 md:gap-3 bg-[#FFFFFF] ${index !== group.performances.length - 1 ? 'border-b-[2px] border-[#1C1C1C] border-dashed' : ''}`}>
                           <div className="w-full flex justify-between items-start">
                             <div className="flex-1 text-[#1C1C1C] text-[13px] md:text-sm font-bold leading-tight line-clamp-1 mt-0.5">{perf.video.title}</div>
                             <div className="md:hidden shrink-0 self-start ml-2">{playButton}</div>
@@ -523,7 +524,7 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
                       <div className="w-full md:w-2/5 p-3 md:p-4 flex flex-col gap-2 border-b-[2px] border-dashed md:border-b-0 md:border-r-[2px] md:border-solid border-[#1C1C1C] bg-white">
                         {playingVideo?.id === video.id ? (
                           <div className="w-full aspect-video rounded-xl overflow-hidden bg-black">
-                            <iframe id={`yt-${video.id}`} src={`https://www.youtube.com/embed/${video.youtubeId}?autoplay=1&enablejsapi=1${playingVideo.startSeconds ? `&start=${playingVideo.startSeconds}` : ''}`} title={video.title} className="w-full h-full border-0" allow="autoplay; encrypted-media" allowFullScreen />
+                            <iframe id={`yt-${video.id}`} src={`https://www.youtube.com/embed/${video.youtubeId}?autoplay=1&enablejsapi=1&playsinline=1${playingVideo.startSeconds ? `&start=${playingVideo.startSeconds}` : ''}`} title={video.title} className="w-full h-full border-0" allow="autoplay; encrypted-media" allowFullScreen playsInline />
                           </div>
                         ) : (
                           <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-black cursor-pointer" onClick={() => setPlayingVideo({ id: video.id, startSeconds: relatedPerformances[0]?.startSeconds || null, isPaused: false })}>
@@ -609,7 +610,7 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
                     <div className="w-full md:w-2/5 p-3 md:p-4 flex flex-col gap-2 border-b-[2px] border-dashed md:border-b-0 md:border-r-[2px] md:border-solid border-[#1C1C1C] bg-[#FFFFFF]">
                       {playingVideo?.id === video.id ? (
                         <div className="w-full aspect-video rounded-xl overflow-hidden bg-black">
-                          <iframe id={`yt-${video.id}`} src={`https://www.youtube.com/embed/${video.youtubeId}?autoplay=1&enablejsapi=1${playingVideo.startSeconds ? `&start=${playingVideo.startSeconds}` : ''}`} title={video.title} className="w-full h-full border-0" allow="autoplay; encrypted-media" allowFullScreen />
+                          <iframe id={`yt-${video.id}`} src={`https://www.youtube.com/embed/${video.youtubeId}?autoplay=1&enablejsapi=1&playsinline=1${playingVideo.startSeconds ? `&start=${playingVideo.startSeconds}` : ''}`} title={video.title} className="w-full h-full border-0" allow="autoplay; encrypted-media" allowFullScreen playsInline />
                         </div>
                       ) : (
                         <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-black cursor-pointer" onClick={() => setPlayingVideo({ id: video.id, startSeconds: relatedPerformances[0]?.startSeconds || null, isPaused: false })}>
