@@ -3,6 +3,13 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { Performance, Video } from "@/lib/microcms";
 
+type GroupedSong = {
+  songId: string;
+  title: string;
+  artist: string;
+  performances: Performance[];
+};
+
 type CustomPerformance = Performance & { collaborators?: string };
 
 const MEMBERS = [
