@@ -253,7 +253,7 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
                 <div className={`w-full flex flex-row items-center gap-3 md:gap-4 px-4 md:px-6 transition-opacity duration-300 ease-in-out ${isFading ? 'opacity-0' : 'opacity-100'}`}>
                   <div className="w-2/3 md:w-1/2 lg:w-[480px] aspect-video rounded-xl overflow-hidden bg-black shrink-0 border-[2px] border-[#1C1C1C]">
                     {playingVideo?.id === `pickup-${pickup.video.id}` ? (
-                      <iframe id={`yt-pickup-${pickup.video.id}`} src={`https://www.youtube.com/embed/${pickup.video.youtubeId}?autoplay=1&enablejsapi=1&playsinline=1${pickup.startSeconds ? `&start=${pickup.startSeconds}` : ''}`} title={pickup.song.title} className="w-full h-full border-0" allow="autoplay; encrypted-media" allowFullScreen playsInline />
+                      <iframe id={`yt-pickup-${pickup.video.id}`} src={`https://www.youtube.com/embed/${pickup.video.youtubeId}?autoplay=1&enablejsapi=1&playsinline=1${pickup.startSeconds ? `&start=${pickup.startSeconds}` : ''}`} title={pickup.song.title} className="w-full h-full border-0" allow="autoplay; encrypted-media" allowFullScreen />
                     ) : (
                       <div className="relative w-full h-full cursor-pointer" onClick={() => setPlayingVideo({ id: `pickup-${pickup.video.id}`, startSeconds: pickup.startSeconds || null, isPaused: false })}>
                         <img src={`https://img.youtube.com/vi/${pickup.video.youtubeId}/maxresdefault.jpg`} onError={(e) => { e.currentTarget.src = `https://img.youtube.com/vi/${pickup.video.youtubeId}/hqdefault.jpg`; }} alt={pickup.song.title} className="w-full h-full object-cover opacity-95" />
@@ -524,7 +524,7 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
                       <div className="w-full md:w-2/5 p-3 md:p-4 flex flex-col gap-2 border-b-[2px] border-dashed md:border-b-0 md:border-r-[2px] md:border-solid border-[#1C1C1C] bg-white">
                         {playingVideo?.id === video.id ? (
                           <div className="w-full aspect-video rounded-xl overflow-hidden bg-black">
-                            <iframe id={`yt-${video.id}`} src={`https://www.youtube.com/embed/${video.youtubeId}?autoplay=1&enablejsapi=1&playsinline=1${playingVideo.startSeconds ? `&start=${playingVideo.startSeconds}` : ''}`} title={video.title} className="w-full h-full border-0" allow="autoplay; encrypted-media" allowFullScreen playsInline />
+                            <iframe id={`yt-${video.id}`} src={`https://www.youtube.com/embed/${video.youtubeId}?autoplay=1&enablejsapi=1&playsinline=1${playingVideo.startSeconds ? `&start=${playingVideo.startSeconds}` : ''}`} title={video.title} className="w-full h-full border-0" allow="autoplay; encrypted-media" allowFullScreen />
                           </div>
                         ) : (
                           <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-black cursor-pointer" onClick={() => setPlayingVideo({ id: video.id, startSeconds: relatedPerformances[0]?.startSeconds || null, isPaused: false })}>
@@ -610,7 +610,7 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
                     <div className="w-full md:w-2/5 p-3 md:p-4 flex flex-col gap-2 border-b-[2px] border-dashed md:border-b-0 md:border-r-[2px] md:border-solid border-[#1C1C1C] bg-[#FFFFFF]">
                       {playingVideo?.id === video.id ? (
                         <div className="w-full aspect-video rounded-xl overflow-hidden bg-black">
-                          <iframe id={`yt-${video.id}`} src={`https://www.youtube.com/embed/${video.youtubeId}?autoplay=1&enablejsapi=1&playsinline=1${playingVideo.startSeconds ? `&start=${playingVideo.startSeconds}` : ''}`} title={video.title} className="w-full h-full border-0" allow="autoplay; encrypted-media" allowFullScreen playsInline />
+                          <iframe id={`yt-${video.id}`} src={`https://www.youtube.com/embed/${video.youtubeId}?autoplay=1&enablejsapi=1&playsinline=1${playingVideo.startSeconds ? `&start=${playingVideo.startSeconds}` : ''}`} title={video.title} className="w-full h-full border-0" allow="autoplay; encrypted-media" allowFullScreen />
                         </div>
                       ) : (
                         <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-black cursor-pointer" onClick={() => setPlayingVideo({ id: video.id, startSeconds: relatedPerformances[0]?.startSeconds || null, isPaused: false })}>
