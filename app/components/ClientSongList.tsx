@@ -277,14 +277,14 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
                     <button onClick={(e) => {
                         e.preventDefault();
                         const isPlayingPickup = playingVideo?.id === `pickup-${pickup.video.id}`;
-                        if (isPlayingPickup && playingVideo) {
+                        if (isPlayingPickup) {
                           const iframe = document.getElementById(`yt-pickup-${pickup.video.id}`) as HTMLIFrameElement;
-                          if (playingVideo.isPaused) {
+                          if (playingVideo?.isPaused) {
                             iframe?.contentWindow?.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-                            setPlayingVideo({ ...playingVideo, isPaused: false });
+                            setPlayingVideo(prev => prev ? { ...prev, isPaused: false } : null);
                           } else {
                             iframe?.contentWindow?.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
-                            setPlayingVideo({ ...playingVideo, isPaused: true });
+                            setPlayingVideo(prev => prev ? { ...prev, isPaused: true } : null);
                           }
                         } else {
                           setPlayingVideo({ id: `pickup-${pickup.video.id}`, startSeconds: pickup.startSeconds || null, isPaused: false });
@@ -552,21 +552,21 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
                             </div>
                             <button onClick={(e) => {
                                 e.preventDefault();
-                                if (isPlayingThis && playingVideo) {
+                                if (isPlayingThis) {
                                   const iframe = document.getElementById(`yt-${video.id}`) as HTMLIFrameElement;
-                                  if (playingVideo.isPaused) {
+                                  if (playingVideo?.isPaused) {
                                     iframe?.contentWindow?.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-                                    setPlayingVideo({ ...playingVideo, isPaused: false });
+                                    setPlayingVideo(prev => prev ? { ...prev, isPaused: false } : null);
                                   } else {
                                     iframe?.contentWindow?.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
-                                    setPlayingVideo({ ...playingVideo, isPaused: true });
+                                    setPlayingVideo(prev => prev ? { ...prev, isPaused: true } : null);
                                   }
                                 } else {
                                   setPlayingVideo({ id: video.id, startSeconds: relatedPerformances[0]?.startSeconds || null, isPaused: false });
                                 }
                               }}
-                              className={`h-8 px-8 ${isPlayingThis && !playingVideo.isPaused ? 'bg-[#1C1C1C]' : 'bg-[#FF3366]'} border-[2px] border-[#1C1C1C] shadow-[2px_2px_0px_#1C1C1C] hover:translate-y-[1px] hover:translate-x-[1px] hover:shadow-none transition-all duration-200 rounded-xl flex items-center justify-center shrink-0`}>
-                              {isPlayingThis && !playingVideo.isPaused ? PauseIcon : PlayIcon}
+                              className={`h-8 px-8 ${isPlayingThis && !playingVideo?.isPaused ? 'bg-[#1C1C1C]' : 'bg-[#FF3366]'} border-[2px] border-[#1C1C1C] shadow-[2px_2px_0px_#1C1C1C] hover:translate-y-[1px] hover:translate-x-[1px] hover:shadow-none transition-all duration-200 rounded-xl flex items-center justify-center shrink-0`}>
+                              {isPlayingThis && !playingVideo?.isPaused ? PauseIcon : PlayIcon}
                             </button>
                           </div>
                         ) : (
@@ -574,21 +574,21 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
                             <button onClick={(e) => {
                                 e.preventDefault();
                                 const isVideoOnlyPlaying = playingVideo?.id === video.id && playingVideo?.startSeconds === null;
-                                if (isVideoOnlyPlaying && playingVideo) {
+                                if (isVideoOnlyPlaying) {
                                   const iframe = document.getElementById(`yt-${video.id}`) as HTMLIFrameElement;
-                                  if (playingVideo.isPaused) {
+                                  if (playingVideo?.isPaused) {
                                     iframe?.contentWindow?.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-                                    setPlayingVideo({ ...playingVideo, isPaused: false });
+                                    setPlayingVideo(prev => prev ? { ...prev, isPaused: false } : null);
                                   } else {
                                     iframe?.contentWindow?.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
-                                    setPlayingVideo({ ...playingVideo, isPaused: true });
+                                    setPlayingVideo(prev => prev ? { ...prev, isPaused: true } : null);
                                   }
                                 } else {
                                   setPlayingVideo({ id: video.id, startSeconds: null, isPaused: false });
                                 }
                               }}
-                              className={`h-8 px-8 ${playingVideo?.id === video.id && playingVideo?.startSeconds === null && !playingVideo.isPaused ? 'bg-[#1C1C1C]' : 'bg-[#FF3366]'} border-[2px] border-[#1C1C1C] shadow-[2px_2px_0px_#1C1C1C] hover:translate-y-[1px] hover:translate-x-[1px] hover:shadow-none transition-all duration-200 rounded-xl flex items-center justify-center shrink-0`}>
-                              {playingVideo?.id === video.id && playingVideo?.startSeconds === null && !playingVideo.isPaused ? PauseIcon : PlayIcon}
+                              className={`h-8 px-8 ${playingVideo?.id === video.id && playingVideo?.startSeconds === null && !playingVideo?.isPaused ? 'bg-[#1C1C1C]' : 'bg-[#FF3366]'} border-[2px] border-[#1C1C1C] shadow-[2px_2px_0px_#1C1C1C] hover:translate-y-[1px] hover:translate-x-[1px] hover:shadow-none transition-all duration-200 rounded-xl flex items-center justify-center shrink-0`}>
+                              {playingVideo?.id === video.id && playingVideo?.startSeconds === null && !playingVideo?.isPaused ? PauseIcon : PlayIcon}
                             </button>
                           </div>
                         )}
@@ -646,21 +646,21 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
                                 </div>
                                 <button onClick={(e) => {
                                     e.preventDefault();
-                                    if (isPlayingThis && playingVideo) {
+                                    if (isPlayingThis) {
                                       const iframe = document.getElementById(`yt-${video.id}`) as HTMLIFrameElement;
-                                      if (playingVideo.isPaused) {
+                                      if (playingVideo?.isPaused) {
                                         iframe?.contentWindow?.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-                                        setPlayingVideo({ ...playingVideo, isPaused: false });
+                                        setPlayingVideo(prev => prev ? { ...prev, isPaused: false } : null);
                                       } else {
                                         iframe?.contentWindow?.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
-                                        setPlayingVideo({ ...playingVideo, isPaused: true });
+                                        setPlayingVideo(prev => prev ? { ...prev, isPaused: true } : null);
                                       }
                                     } else {
                                       setPlayingVideo({ id: video.id, startSeconds: perf.startSeconds || null, isPaused: false });
                                     }
                                   }}
-                                  className={`h-8 px-5 ${isPlayingThis && !playingVideo.isPaused ? 'bg-[#1C1C1C]' : 'bg-[#FF3366]'} border-[2px] border-[#1C1C1C] shadow-[2px_2px_0px_#1C1C1C] hover:translate-y-[1px] hover:translate-x-[1px] hover:shadow-none transition-all duration-200 rounded-lg flex items-center justify-center gap-1 shrink-0`}>
-                                  {isPlayingThis && !playingVideo.isPaused ? PauseIcon : PlayIcon}
+                                  className={`h-8 px-5 ${isPlayingThis && !playingVideo?.isPaused ? 'bg-[#1C1C1C]' : 'bg-[#FF3366]'} border-[2px] border-[#1C1C1C] shadow-[2px_2px_0px_#1C1C1C] hover:translate-y-[1px] hover:translate-x-[1px] hover:shadow-none transition-all duration-200 rounded-lg flex items-center justify-center gap-1 shrink-0`}>
+                                  {isPlayingThis && !playingVideo?.isPaused ? PauseIcon : PlayIcon}
                                   {perf.startSeconds && <div className="text-white text-[10px] md:text-xs font-bold font-mono ml-0.5">{formatTime(perf.startSeconds)}</div>}
                                 </button>
                               </div>
