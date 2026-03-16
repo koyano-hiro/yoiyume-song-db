@@ -244,7 +244,6 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
                 </div>
 
                 <div className={`w-full flex flex-row items-start md:items-center gap-3 md:gap-4 px-4 md:px-6 transition-opacity duration-300 ease-in-out ${isFading ? 'opacity-0' : 'opacity-100'}`}>
-                  {/* サムネイル幅を拡大し、横並びを維持 */}
                   <div className="w-[45%] md:w-1/2 lg:w-[480px] aspect-video rounded-xl overflow-hidden bg-black shrink-0 border-[2px] border-[#1C1C1C]">
                     {playingVideo?.id === `pickup-${pickup.video.id}` ? (
                       <iframe id={`yt-pickup-${pickup.video.id}`} src={`https://www.youtube.com/embed/${pickup.video.youtubeId}?autoplay=1&enablejsapi=1${pickup.startSeconds ? `&start=${pickup.startSeconds}` : ''}`} title={pickup.song.title} className="w-full h-full border-0" allow="autoplay; encrypted-media" allowFullScreen />
@@ -278,7 +277,7 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
                     <button onClick={(e) => {
                         e.preventDefault();
                         const isPlayingPickup = playingVideo?.id === `pickup-${pickup.video.id}`;
-                        if (isPlayingPickup) {
+                        if (isPlayingPickup && playingVideo) {
                           const iframe = document.getElementById(`yt-pickup-${pickup.video.id}`) as HTMLIFrameElement;
                           if (playingVideo.isPaused) {
                             iframe?.contentWindow?.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
@@ -304,7 +303,6 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
           <div className="w-full px-4 md:px-6 pt-6 pb-28 flex flex-col items-center">
             <div className="relative rounded-full bg-white flex w-full md:max-w-[500px] h-12 md:h-14 items-center mb-1 border-[2px] border-[#1C1C1C] overflow-hidden">
               <div className={`absolute top-[-2px] bottom-[-2px] left-[0px] w-[calc(50%+2px)] bg-[#F3F3F3] rounded-full border-[2px] border-[#1C1C1C] shadow-[2px_1px_0px_#1C1C1C] transition-transform duration-300 ease-[cubic-bezier(0.4,0.0,0.2,1)]`} style={{ transform: activeTab === 'songs' ? 'translateX(-2px)' : 'translateX(calc(100% - 4px))' }} />
-              {/* タブの絵文字削除 */}
               <button onClick={() => handleTabChange('songs')} className={`relative z-10 flex-1 h-full flex justify-center items-center gap-1 md:gap-2 font-bold text-sm md:text-base transition-colors duration-300 ${activeTab === 'songs' ? 'text-[#1C1C1C]' : 'text-gray-500 hover:text-[#1C1C1C]'}`}>
                 曲から探す
               </button>
@@ -333,7 +331,6 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
                       <div className="flex flex-col gap-4 md:gap-5">
                         <div className="flex flex-col gap-2">
                           <div className="text-xs md:text-sm font-bold text-[#1C1C1C] ml-1">📌 項目</div>
-                          {/* 枠線(border)がないトグル */}
                           <div className="relative border-[2px] border-[#1C1C1C] rounded-full bg-white flex w-full h-10 md:h-12 items-center p-0 overflow-hidden">
                             <div className={`absolute top-[-2px] bottom-[-2px] left-[0px] w-[calc(50%+2px)] transition-transform duration-300 ease-[cubic-bezier(0.4,0.0,0.2,1)] ${tempSortConfig.key === 'title' ? 'translate-x-[calc(100%-4px)]' : 'translate-x-[-2px]'}`}>
                               <div className="w-full h-full bg-[#F3F3F3] rounded-full border-[2px] border-[#1C1C1C] shadow-[2px_1px_0px_#1C1C1C]"></div>
@@ -413,14 +410,14 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
                   <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 w-full">
                     <div className="relative flex w-full md:w-[240px] h-9 border-[2px] border-[#1C1C1C] rounded-md bg-white shadow-[2px_2px_0px_#1C1C1C] overflow-hidden shrink-0">
                       <div className="absolute top-[0px] bottom-[0px] left-[0px] w-[calc(33.333%+2px)] bg-[#1C1C1C] transition-transform duration-300 ease-in-out" style={{ transform: performanceMode === 'all' ? 'translateX(-2px)' : performanceMode === 'vocal' ? 'translateX(calc(100% - 4px))' : 'translateX(calc(200% - 6px))' }} />
-                      <button onClick={() => setPerformanceMode('all')} className={`relative z-10 flex-1 flex justify-center items-center text-xs font-bold transition-colors border-r-[2px] border-[#1C1C1C] ${performanceMode === 'all' ? 'text-white border-transparent' : 'text-[#1C1C1C] hover:bg-gray-100'}`}>すべて</button>
-                      <button onClick={() => setPerformanceMode('vocal')} className={`relative z-10 flex-1 flex justify-center items-center text-xs font-bold transition-colors border-r-[2px] border-[#1C1C1C] ${performanceMode === 'vocal' ? 'text-white border-transparent' : 'text-[#1C1C1C] hover:bg-gray-100'}`}>歌</button>
-                      <button onClick={() => setPerformanceMode('inst')} className={`relative z-10 flex-1 flex justify-center items-center text-xs font-bold transition-colors ${performanceMode === 'inst' ? 'text-white border-transparent' : 'text-[#1C1C1C] hover:bg-gray-100'}`}>演奏</button>
+                      <button onClick={() => setPerformanceMode('all')} className={`relative z-10 flex-1 flex justify-center items-center text-xs font-bold transition-colors ${performanceMode === 'all' ? 'text-white' : 'text-[#1C1C1C] hover:bg-gray-100'}`}>すべて</button>
+                      <button onClick={() => setPerformanceMode('vocal')} className={`relative z-10 flex-1 flex justify-center items-center text-xs font-bold transition-colors ${performanceMode === 'vocal' ? 'text-white' : 'text-[#1C1C1C] hover:bg-gray-100'}`}>歌</button>
+                      <button onClick={() => setPerformanceMode('inst')} className={`relative z-10 flex-1 flex justify-center items-center text-xs font-bold transition-colors ${performanceMode === 'inst' ? 'text-white' : 'text-[#1C1C1C] hover:bg-gray-100'}`}>演奏</button>
                     </div>
                   </div>
                 ) : (
                   <div className="relative w-full">
-                    <div className="flex items-center gap-1.5 w-full overflow-x-auto whitespace-nowrap pb-2 -mb-2 pr-8 scrollbar-hide" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
+                    <div className="flex items-center gap-1.5 w-full overflow-x-auto whitespace-nowrap pb-2 -mb-2 pr-12 scrollbar-hide" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
                       <style dangerouslySetInnerHTML={{__html: `.scrollbar-hide::-webkit-scrollbar { display: none; }`}} />
                       {VIDEO_TYPES.map((type) => {
                         const isActive = selectedType === type;
@@ -436,7 +433,7 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
                       <button onClick={() => setShortsMode(shortsMode === 'shorts' ? 'all' : 'shorts')} className={`h-9 px-3 rounded-md flex-shrink-0 flex justify-center items-center font-bold text-[11px] md:text-xs transition-all border-[2px] border-dashed border-[#1C1C1C] ${shortsMode === 'shorts' ? 'bg-[#1C1C1C] text-white shadow-none translate-y-[1px] translate-x-[1px]' : 'bg-white text-[#1C1C1C] shadow-[2px_2px_0px_#1C1C1C] hover:translate-y-[1px] hover:translate-x-[1px] hover:shadow-none'}`}>
                         Shortsのみ
                       </button>
-                      <div className="w-4 shrink-0"></div> {/* 右余白 */}
+                      <div className="w-6 shrink-0"></div>
                     </div>
                     <div className="absolute right-0 top-0 bottom-2 w-8 bg-gradient-to-l from-[#F3F3F3] to-transparent pointer-events-none"></div>
                   </div>
@@ -470,38 +467,36 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
                         </a>
                       );
                       return (
-                        <div key={perf.id} className={`px-3 py-3 md:px-4 md:py-4 flex flex-col md:flex-row justify-between items-start gap-2 bg-[#FFFFFF] hover:bg-orange-50 transition-colors ${index !== group.performances.length - 1 ? 'border-b-[2px] border-[#1C1C1C] border-dashed' : ''}`}>
-                          <div className="w-full flex-1 flex flex-col gap-2 md:gap-3">
-                            <div className="text-[#1C1C1C] text-[13px] md:text-sm font-bold leading-tight line-clamp-1 mb-1 mt-0">{perf.video.title}</div>
-                            <div className="w-full flex flex-row justify-between items-start">
-                              <div className="flex flex-wrap items-center gap-2">
-                                {perf.singers?.map(singer => {
-                                  const memberDef = MEMBERS.find(m => m.name === singer);
-                                  return (
-                                    <div key={singer} className="px-1.5 py-[1px] rounded text-[9px] md:text-[10px] font-bold text-[#1C1C1C]" style={{ backgroundColor: memberDef?.color || '#D2DBF8' }}>
-                                      {memberDef?.emoji} {memberDef?.name || singer}
-                                    </div>
-                                  );
-                                })}
-                                {perf.collaborators && (
-                                  <div className="px-1.5 py-[1px] bg-[#D2DBF8] rounded text-[#1C1C1C] text-[9px] md:text-[10px] font-bold">
-                                    🤝 {perf.collaborators}
-                                  </div>
-                                )}
-                                <div className="text-[#1C1C1C] bg-[#D2DBF8] rounded text-[9px] md:text-[10px] font-bold px-1.5 py-[1px]">
-                                  {perf.video.type[0]}
-                                </div>
-                                {(perf.video.isShorts === true || perf.video.type?.includes("Shorts")) && (
-                                  <div className="px-1.5 py-[1px] bg-gray-200 rounded text-gray-600 text-[9px] md:text-[10px] font-bold">
-                                    Shorts
-                                  </div>
-                                )}
-                                <div className="text-gray-500 text-[10px] font-mono ml-1">{formatDate(perf.video.streamingDate)}</div>
-                              </div>
-                              <div className="md:hidden shrink-0 self-center">{playButton}</div>
-                            </div>
+                        <div key={perf.id} className={`px-3 py-3 flex flex-col justify-between items-start gap-2 md:gap-3 bg-[#FFFFFF] hover:bg-orange-50 transition-colors ${index !== group.performances.length - 1 ? 'border-b-[2px] border-[#1C1C1C] border-dashed' : ''}`}>
+                          <div className="w-full flex justify-between items-start">
+                            <div className="flex-1 text-[#1C1C1C] text-[13px] md:text-sm font-bold leading-tight line-clamp-1 mt-0.5">{perf.video.title}</div>
+                            <div className="md:hidden shrink-0 self-start ml-2">{playButton}</div>
+                            <div className="hidden md:flex shrink-0 self-center ml-2">{playButton}</div>
                           </div>
-                          <div className="hidden md:flex shrink-0 ml-1 self-center">{playButton}</div>
+                          <div className="w-full flex flex-wrap items-center gap-2">
+                            {perf.singers?.map(singer => {
+                              const memberDef = MEMBERS.find(m => m.name === singer);
+                              return (
+                                <div key={singer} className="px-1.5 py-[1px] rounded text-[9px] md:text-[10px] font-bold text-[#1C1C1C]" style={{ backgroundColor: memberDef?.color || '#D2DBF8' }}>
+                                  {memberDef?.emoji} {memberDef?.name || singer}
+                                </div>
+                              );
+                            })}
+                            {perf.collaborators && (
+                              <div className="px-1.5 py-[1px] bg-[#D2DBF8] rounded text-[#1C1C1C] text-[9px] md:text-[10px] font-bold">
+                                🤝 {perf.collaborators}
+                              </div>
+                            )}
+                            <div className="text-[#1C1C1C] bg-[#D2DBF8] rounded text-[9px] md:text-[10px] font-bold px-1.5 py-[1px]">
+                              {perf.video.type[0]}
+                            </div>
+                            {(perf.video.isShorts === true || perf.video.type?.includes("Shorts")) && (
+                              <div className="px-1.5 py-[1px] bg-gray-200 rounded text-gray-600 text-[9px] md:text-[10px] font-bold">
+                                Shorts
+                              </div>
+                            )}
+                            <div className="text-gray-500 text-[10px] font-mono ml-1">{formatDate(perf.video.streamingDate)}</div>
+                          </div>
                         </div>
                       );
                     })}
@@ -557,7 +552,7 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
                             </div>
                             <button onClick={(e) => {
                                 e.preventDefault();
-                                if (isPlayingThis) {
+                                if (isPlayingThis && playingVideo) {
                                   const iframe = document.getElementById(`yt-${video.id}`) as HTMLIFrameElement;
                                   if (playingVideo.isPaused) {
                                     iframe?.contentWindow?.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
@@ -579,7 +574,7 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
                             <button onClick={(e) => {
                                 e.preventDefault();
                                 const isVideoOnlyPlaying = playingVideo?.id === video.id && playingVideo?.startSeconds === null;
-                                if (isVideoOnlyPlaying) {
+                                if (isVideoOnlyPlaying && playingVideo) {
                                   const iframe = document.getElementById(`yt-${video.id}`) as HTMLIFrameElement;
                                   if (playingVideo.isPaused) {
                                     iframe?.contentWindow?.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
@@ -651,7 +646,7 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
                                 </div>
                                 <button onClick={(e) => {
                                     e.preventDefault();
-                                    if (isPlayingThis) {
+                                    if (isPlayingThis && playingVideo) {
                                       const iframe = document.getElementById(`yt-${video.id}`) as HTMLIFrameElement;
                                       if (playingVideo.isPaused) {
                                         iframe?.contentWindow?.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
