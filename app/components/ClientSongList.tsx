@@ -692,9 +692,10 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
           <div className={`w-full max-w-3xl mx-auto bg-[#F3F3F3] border-t-[2px] md:border-x-[2px] border-[#1C1C1C] transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${isFooterExpanded ? 'translate-y-0' : 'translate-y-full absolute bottom-0'}`}>
             <div className="p-4 pb-12 mx-auto text-[10px] text-[#1C1C1C] font-normal leading-relaxed flex flex-col gap-1.5">
               <p>※ このサイトは、ファンが制作・更新している非公式のファンサイトです。ご本人や所属事務所様とは一切関係ありません。各動画・楽曲の権利は各権利者様に帰属します。</p>
+              <p>※ 現在YouTube上で公開中の動画のみを掲載しています。また、切り抜きのShorts動画は掲載していません。</p>
               <p>※ 最新の情報を登録・反映するまでには時間がかかることがあります。ゆるりとお待ち下さい。</p>
-              <p>※ サイトのシェア・紹介は大歓迎です！ご自由にどうぞ。</p>
-              <p>※ お問い合わせ、修正依頼などは <a href="https://x.com/asa_go_han_" target="_blank" rel="noopener noreferrer" className="text-[#FF9900] hover:underline font-bold">X(@asa_go_han_)</a>のDMにてお気軽にご連絡ください。</p>
+              <p>※ サイトのシェア・紹介はご自由にどうぞ。</p>
+              <p>※ お問い合わせや、権利者様からの修正依頼などは <a href="https://x.com/asa_go_han_" target="_blank" rel="noopener noreferrer" className="text-[#FF9900] hover:underline font-bold">X(@asa_go_han_)</a>のDMにてお気軽にご連絡ください。</p>
             </div>
           </div>
           <div className="w-full bg-white relative z-10">
