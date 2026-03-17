@@ -172,7 +172,7 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
   const filteredSongs = useMemo(() => groupedSongs.map((g) => {
     const perfs = g.performances.filter((perf) => {
       const matchM = selectedMembers.length === 0 || selectedMembers.every(m => perf.singers?.includes(m));
-      const isInst = perf.video.type?.includes("弾いてみた");
+      const isInst = perf.video.type?.includes("弾いてみた") || perf.video.type?.includes("練習");
       const matchPM = performanceMode === 'all' || (performanceMode === 'vocal' && !isInst) || (performanceMode === 'inst' && isInst);
       return matchM && matchPM;
     });
@@ -270,8 +270,8 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
                       {pickup.singers?.map(singer => {
                         const memberDef = MEMBERS.find(m => m.name === singer);
                         return (
-                          <div key={singer} className="px-1.5 py-[1px] rounded text-[9px] md:text-[10px] font-bold text-[#1C1C1C]" style={{ backgroundColor: memberDef?.color || '#FFFFFF' }}>
-                            {memberDef?.emoji} {memberDef?.name || singer}
+                          <div key={singer} className="w-5 h-5 md:w-6 md:h-6 rounded-full flex items-center justify-center text-[10px] md:text-xs" style={{ backgroundColor: memberDef?.color || '#FFFFFF' }} title={memberDef?.name || singer}>
+                            {memberDef?.emoji}
                           </div>
                         );
                       })}
