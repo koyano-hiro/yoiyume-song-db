@@ -149,7 +149,18 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
     if (validPerformances.length > 0) {
       setIsFading(true);
       setTimeout(() => {
-        setPickup(validPerformances[Math.floor(Math.random() * validPerformances.length)]);
+        // まず曲単位でグルーピングし、ランダムに1曲選ぶ → その曲のperformanceから1つ選ぶ
+        // これにより練習動画が多い曲でも確率が偏らない
+        const songMap = new Map<string, CustomPerformance[]>();
+        validPerformances.forEach(p => {
+          if (!p.song) return;
+          const key = p.song.id;
+          if (!songMap.has(key)) songMap.set(key, []);
+          songMap.get(key)!.push(p);
+        });
+        const songGroups = Array.from(songMap.values());
+        const randomGroup = songGroups[Math.floor(Math.random() * songGroups.length)];
+        setPickup(randomGroup[Math.floor(Math.random() * randomGroup.length)]);
         setIsFading(false);
       }, 300);
     }
@@ -708,4 +719,5 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
       </div>
     </div>
   );
+}
 }
