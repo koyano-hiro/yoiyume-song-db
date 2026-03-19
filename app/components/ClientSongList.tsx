@@ -720,4 +720,3 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
     </div>
   );
 }
-}
