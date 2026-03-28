@@ -21,6 +21,42 @@ const MEMBERS = [
 
 const VIDEO_TYPES = ["ライブ・歌枠", "オリジナル", "歌ってみた", "弾いてみた", "練習", "その他"];
 
+// よいゆめユニットチャンネル判定用
+const UNIT_CHANNEL_KEYWORDS = ["今宵、××と夢を見る。"];
+const MEMBER_NAMES = MEMBERS.map(m => m.name);
+
+function isUnitChannel(channelName?: string): boolean {
+  if (!channelName) return false;
+  return UNIT_CHANNEL_KEYWORDS.some(kw => channelName.includes(kw));
+}
+
+/** 🤝タグに表示するコラボ/ゲスト情報を返す。表示不要ならnull */
+function getCollabLabel(perf: CustomPerformance, video: Video): string | null {
+  const channelName = video.channel?.name;
+
+  // よいゆめチャンネル → 全員が基本なのでタグ不要
+  if (isUnitChannel(channelName)) return null;
+
+  const parts: string[] = [];
+
+  // 1) チャンネル主がメンバーの場合、singersからチャンネル主以外のメンバーをゲストとして抽出
+  if (channelName && MEMBER_NAMES.includes(channelName)) {
+    const guestMembers = (perf.singers || []).filter(
+      s => s !== channelName && MEMBER_NAMES.includes(s)
+    );
+    if (guestMembers.length > 0) {
+      parts.push(guestMembers.join(","));
+    }
+  }
+
+  // 2) CMSの「コラボ相手」フィールドがあればそれも追加
+  if (perf.collaborators) {
+    parts.push(perf.collaborators);
+  }
+
+  return parts.length > 0 ? parts.join(",") : null;
+}
+
 function formatTime(s: number) {
   const h = Math.floor(s / 3600);
   const m = Math.floor((s % 3600) / 60);
@@ -563,10 +599,19 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
                         </div>
                       </div>
                       <div className="w-full md:w-3/5 flex flex-col bg-white">
-                        {relatedPerformances.length === 1 ? (
+                        {relatedPerformances.length === 1 ? (() => {
+                          const compactCollabLabel = getCollabLabel(relatedPerformances[0], video);
+                          return (
                           <div className="px-3 py-2 md:px-4 flex justify-between items-center gap-2 bg-[#FFFFFF] hover:bg-orange-50 transition-colors w-full h-full">
                             <div className="flex-1 flex flex-col pr-2">
-                              <div className="text-[#1C1C1C] text-[13px] md:text-sm font-bold leading-tight line-clamp-1">{relatedPerformances[0].song.title}</div>
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className="text-[#1C1C1C] text-[13px] md:text-sm font-bold leading-tight line-clamp-1">{relatedPerformances[0].song.title}</span>
+                                {compactCollabLabel && (
+                                  <span className="inline-flex items-center px-1.5 py-[1px] bg-[#E8F4EA] rounded text-[9px] md:text-[10px] font-bold text-[#1C1C1C] whitespace-nowrap shrink-0">
+                                    🤝{compactCollabLabel}
+                                  </span>
+                                )}
+                              </div>
                               <div className="text-gray-500 text-[10px] font-normal mt-0.5">{relatedPerformances[0].song.artist}</div>
                             </div>
                             <button onClick={(e) => {
@@ -588,7 +633,8 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
                               {isPlayingThis && !playingVideo?.isPaused ? PauseIcon : PlayIcon}
                             </button>
                           </div>
-                        ) : (
+                          );
+                        })() : (
                           <div className="px-3 py-2 md:px-4 flex justify-end items-center gap-2 bg-[#FFFFFF] hover:bg-gray-50 transition-colors w-full h-full">
                             <button onClick={(e) => {
                                 e.preventDefault();
@@ -657,10 +703,18 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
                         {relatedPerformances.length > 0 ? (
                           relatedPerformances.map((perf, index) => {
                             const isPlayingThis = playingVideo?.id === video.id && playingVideo?.startSeconds === (perf.startSeconds || null);
+                            const collabLabel = getCollabLabel(perf, video);
                             return (
                               <div key={perf.id} className={`px-3 py-2 md:px-4 flex justify-between items-center gap-2 bg-[#FFFFFF] hover:bg-orange-50 transition-colors ${index !== relatedPerformances.length - 1 ? 'border-b-[2px] border-[#1C1C1C] border-dashed' : ''}`}>
                                 <div className="flex-1 flex flex-col pr-2">
-                                  <div className="text-[#1C1C1C] text-[13px] md:text-sm font-bold leading-tight line-clamp-1">{perf.song.title}</div>
+                                  <div className="flex items-center gap-1.5 flex-wrap">
+                                    <span className="text-[#1C1C1C] text-[13px] md:text-sm font-bold leading-tight line-clamp-1">{perf.song.title}</span>
+                                    {collabLabel && (
+                                      <span className="inline-flex items-center px-1.5 py-[1px] bg-[#E8F4EA] rounded text-[9px] md:text-[10px] font-bold text-[#1C1C1C] whitespace-nowrap shrink-0">
+                                        🤝{collabLabel}
+                                      </span>
+                                    )}
+                                  </div>
                                   <div className="text-gray-500 text-[10px] font-normal mt-0.5">{perf.song.artist}</div>
                                 </div>
                                 <button onClick={(e) => {
