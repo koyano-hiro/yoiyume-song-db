@@ -40,9 +40,11 @@ function getCollabLabel(perf: CustomPerformance, video: Video): string | null {
   const parts: string[] = [];
 
   // 1) チャンネル主がメンバーの場合、singersからチャンネル主以外のメンバーをゲストとして抽出
-  if (channelName && MEMBER_NAMES.includes(channelName)) {
+  //    チャンネル名は「猫屋敷美紅 / Nekoyashiki Miku【にじさんじ】」のような形式なので部分一致で判定
+  const channelOwner = channelName ? MEMBER_NAMES.find(name => channelName.includes(name)) : undefined;
+  if (channelOwner) {
     const guestMembers = (perf.singers || []).filter(
-      s => s !== channelName && MEMBER_NAMES.includes(s)
+      s => s !== channelOwner && MEMBER_NAMES.includes(s)
     );
     if (guestMembers.length > 0) {
       parts.push(guestMembers.join(","));
@@ -607,7 +609,7 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
                               <div className="flex items-center gap-1.5 flex-wrap">
                                 <span className="text-[#1C1C1C] text-[13px] md:text-sm font-bold leading-tight line-clamp-1">{relatedPerformances[0].song.title}</span>
                                 {compactCollabLabel && (
-                                  <span className="inline-flex items-center px-1.5 py-[1px] bg-[#E8F4EA] rounded text-[9px] md:text-[10px] font-bold text-[#1C1C1C] whitespace-nowrap shrink-0">
+                                  <span className="inline-flex items-center px-1.5 py-[1px] bg-[#EAEAEA] rounded text-[9px] md:text-[10px] font-bold text-[#1C1C1C] whitespace-nowrap shrink-0">
                                     🤝{compactCollabLabel}
                                   </span>
                                 )}
@@ -710,7 +712,7 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
                                   <div className="flex items-center gap-1.5 flex-wrap">
                                     <span className="text-[#1C1C1C] text-[13px] md:text-sm font-bold leading-tight line-clamp-1">{perf.song.title}</span>
                                     {collabLabel && (
-                                      <span className="inline-flex items-center px-1.5 py-[1px] bg-[#E8F4EA] rounded text-[9px] md:text-[10px] font-bold text-[#1C1C1C] whitespace-nowrap shrink-0">
+                                      <span className="inline-flex items-center px-1.5 py-[1px] bg-[#EAEAEA] rounded text-[9px] md:text-[10px] font-bold text-[#1C1C1C] whitespace-nowrap shrink-0">
                                         🤝{collabLabel}
                                       </span>
                                     )}
