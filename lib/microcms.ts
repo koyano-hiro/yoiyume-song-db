@@ -21,6 +21,7 @@ export type Video = {
   type: string[];
   channel?: Channel; // 文字列からChannel型への参照に変更
   isShorts?: boolean; // ← 【追加】Shorts判定用のプロパティ
+  updatedAt?: string; // microCMSのシステムフィールド（最終データ更新日の算出に使用）
 };
 
 export type Song = {

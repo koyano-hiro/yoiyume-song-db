@@ -78,6 +78,17 @@ const SearchIcon = <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="
 
 export default function ClientSongList({ initialPerformances, initialVideos }: { initialPerformances: CustomPerformance[]; initialVideos: Video[]; }) {
   const validPerformances = useMemo(() => initialPerformances.filter(p => p.video?.isArchived), [initialPerformances]);
+
+  // microCMSの更新日時（performances / videos の updatedAt）の最新をJSTで表示する
+  const lastDataUpdate = useMemo(() => {
+    const dates = [
+      ...initialPerformances.map(p => p.updatedAt),
+      ...initialVideos.map(v => v.updatedAt),
+    ].filter((d): d is string => Boolean(d));
+    if (dates.length === 0) return null;
+    const latest = dates.reduce((a, b) => (a > b ? a : b));
+    return new Date(latest).toLocaleDateString("ja-JP", { timeZone: "Asia/Tokyo" });
+  }, [initialPerformances, initialVideos]);
   const validVideos = useMemo(() => initialVideos.filter(v => v.isArchived), [initialVideos]);
 
   const [activeTab, setActiveTab] = useState<'songs' | 'videos'>('songs');
@@ -763,6 +774,7 @@ export default function ClientSongList({ initialPerformances, initialVideos }: {
               <p>※ 最新の情報を登録・反映するまでには時間がかかることがあります。ゆるりとお待ち下さい。</p>
               <p>※ サイトのシェア・紹介はご自由にどうぞ。</p>
               <p>※ お問い合わせや、権利者様からの修正依頼などは <a href="https://x.com/asa_go_han_" target="_blank" rel="noopener noreferrer" className="text-[#FF9900] hover:underline font-bold">X(@asa_go_han_)</a>のDMにてお気軽にご連絡ください。</p>
+              {lastDataUpdate && <p className="text-gray-500 mt-1">最終データ更新日：{lastDataUpdate}</p>}
             </div>
           </div>
           <div className="w-full bg-white relative z-10">
